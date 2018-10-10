@@ -33,16 +33,52 @@ print("Labels present in Dataset: ", allLabels)
 annotations = np.ndarray(shape=(0,2))
 
 # For each Class get the current ChallengeIDs -> generateFakeLabels
-for label in allLabels:
-    challengeIDs = get_challenge_ids(label,y)
-    newann = generate_new_labels(challengeIDs,[0,1,2],[0.2,0.2,.6], 1000)
 
-    annotations = np.append(annotations, newann, axis=0)
+challengeIDs = get_challenge_ids(0,y)
+newann = generate_new_labels(challengeIDs,[0],[1], 1000)
+annotations = np.append(annotations, newann, axis=0)
+
+challengeIDs = get_challenge_ids(1,y)
+newann = generate_new_labels(challengeIDs,[1,7],[.7,.3], 1000)
+annotations = np.append(annotations, newann, axis=0)
+
+challengeIDs = get_challenge_ids(2,y)
+newann = generate_new_labels(challengeIDs,[2],[1], 1000)
+annotations = np.append(annotations, newann, axis=0)
+
+challengeIDs = get_challenge_ids(3,y)
+newann = generate_new_labels(challengeIDs,[3],[1], 1000)
+annotations = np.append(annotations, newann, axis=0)
+
+challengeIDs = get_challenge_ids(4,y)
+newann = generate_new_labels(challengeIDs,[4],[1], 1000)
+annotations = np.append(annotations, newann, axis=0)
+
+challengeIDs = get_challenge_ids(5,y)
+newann = generate_new_labels(challengeIDs,[5],[1], 1000)
+annotations = np.append(annotations, newann, axis=0)
+
+challengeIDs = get_challenge_ids(6,y)
+newann = generate_new_labels(challengeIDs,[6],[1], 1000)
+annotations = np.append(annotations, newann, axis=0)
+
+challengeIDs = get_challenge_ids(7,y)
+newann = generate_new_labels(challengeIDs,[7,1],[.6,.4], 1000)
+annotations = np.append(annotations, newann, axis=0)
+
+challengeIDs = get_challenge_ids(8,y)
+newann = generate_new_labels(challengeIDs,[8],[1], 1000)
+annotations = np.append(annotations, newann, axis=0)
+
+challengeIDs = get_challenge_ids(9,y)
+newann = generate_new_labels(challengeIDs,[9],[1], 1000)
+annotations = np.append(annotations, newann, axis=0)
+
 
 #Test
 print('Shape of Annnotations', annotations.shape)
-print("0 count: ",np.sum(annotations[:,1] == 0))
-print("1 count: ", np.sum(annotations[:,1] == 1))
-print("2 count: ",np.sum(annotations[:,1] == 2))
+for label in allLabels:
+    print(label ," count: ",np.sum(annotations[:,1] == label))
+
 
 
