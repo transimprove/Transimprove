@@ -15,6 +15,22 @@ def generate_new_labels(challengeIDs, labels, p , count):
     new_labels = np.random.choice(labels,count,True,p)
     return np.array([upsampled, new_labels]).transpose()
 
+def generate_new_labels_confusionmatrix(cm, classes, datapoints, count=1000,normalize=False):
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        print("Normalized confusion matrix")
+    else:
+        print('Confusion matrix, without normalization')
+
+    annotations = np.ndarray(shape=(0,2))
+    for i in np.arange(0, len(classes)):
+        challengeIDs = get_challenge_ids(classes[i], datapoints)
+        newann = generate_new_labels(challengeIDs, classes, cm[i], count)
+        annotations = np.append(annotations, newann, axis=0)  
+
+    return annotations
+
+
 
 from sklearn.datasets import load_iris, load_digits
 X, y = load_iris(True)
@@ -30,50 +46,20 @@ print('Result set shape: ',y.shape)
 allLabels = np.unique(y)
 print("Labels present in Dataset: ", allLabels)
 
-annotations = np.ndarray(shape=(0,2))
-
-# For each Class get the current ChallengeIDs -> generateFakeLabels
-
-challengeIDs = get_challenge_ids(0,y)
-newann = generate_new_labels(challengeIDs,[0],[1], 1000)
-annotations = np.append(annotations, newann, axis=0)
-
-challengeIDs = get_challenge_ids(1,y)
-newann = generate_new_labels(challengeIDs,[1,7],[.7,.3], 1000)
-annotations = np.append(annotations, newann, axis=0)
-
-challengeIDs = get_challenge_ids(2,y)
-newann = generate_new_labels(challengeIDs,[2],[1], 1000)
-annotations = np.append(annotations, newann, axis=0)
-
-challengeIDs = get_challenge_ids(3,y)
-newann = generate_new_labels(challengeIDs,[3],[1], 1000)
-annotations = np.append(annotations, newann, axis=0)
-
-challengeIDs = get_challenge_ids(4,y)
-newann = generate_new_labels(challengeIDs,[4],[1], 1000)
-annotations = np.append(annotations, newann, axis=0)
-
-challengeIDs = get_challenge_ids(5,y)
-newann = generate_new_labels(challengeIDs,[5],[1], 1000)
-annotations = np.append(annotations, newann, axis=0)
-
-challengeIDs = get_challenge_ids(6,y)
-newann = generate_new_labels(challengeIDs,[6],[1], 1000)
-annotations = np.append(annotations, newann, axis=0)
-
-challengeIDs = get_challenge_ids(7,y)
-newann = generate_new_labels(challengeIDs,[7,1],[.6,.4], 1000)
-annotations = np.append(annotations, newann, axis=0)
-
-challengeIDs = get_challenge_ids(8,y)
-newann = generate_new_labels(challengeIDs,[8],[1], 1000)
-annotations = np.append(annotations, newann, axis=0)
-
-challengeIDs = get_challenge_ids(9,y)
-newann = generate_new_labels(challengeIDs,[9],[1], 1000)
-annotations = np.append(annotations, newann, axis=0)
-
+cm = np.array([
+#   0  ,1,2,3,4,5,6,7,8,9
+    [1,   0,   0,   0,   0,   0,   0,   0,   0,   0],   
+    [0, 0.8,   0,   0,   0,   0,   0, 0.2,   0,   0],   
+    [0,   0,   1,   0,   0,   0,   0,   0,   0,   0],   
+    [0,   0,   0,   1,   0,   0,   0,   0,   0,   0],   
+    [0,   0,   0,   0,   1,   0,   0,   0,   0,   0],   
+    [0,   0,   0,   0,   0,   1,   0,   0,   0,   0],   
+    [0,   0,   0,   0,   0,   0,   1,   0,   0,   0],   
+    [0, 0.1,   0,   0,   0,   0,   0, 0.9,   0,   0],   
+    [0,   0,   0,   0,   0,   0,   0,   0,   1,   0],   
+    [0,   0,   0,   0,   0,   0,   0,   0,   0,   1]
+])
+annotations = generate_new_labels_confusionmatrix(cm, allLabels, y, count=1000,normalize=False)
 
 #Test
 print('Shape of Annnotations', annotations.shape)
