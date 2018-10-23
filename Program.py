@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from CreateDistributedLabels import generate_new_labels_confusionmatrix
+from statistic_analysis import rate_annotations_by_datapoint, rate_annotations
 
 from sklearn.datasets import load_iris, load_digits
 X, y = load_iris(True)
@@ -35,3 +36,7 @@ annotations = generate_new_labels_confusionmatrix(cm, allLabels, y, count=1000,n
 print('Shape of Annnotations', annotations.shape)
 for label in allLabels:
     print(label ," count: ",np.sum(annotations[:,1] == label))
+
+rated_annotations = rate_annotations_by_datapoint(annotations)
+print(type(rated_annotations),":")
+print(rated_annotations)
