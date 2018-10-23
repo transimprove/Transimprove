@@ -19,8 +19,6 @@ def generate_new_labels_confusionmatrix(cm, classes, datapoints, count=1000,norm
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         print("Normalized confusion matrix")
-    else:
-        print('Confusion matrix, without normalization')
 
     annotations = np.ndarray(shape=(0,2))
     for i in np.arange(0, len(classes)):
@@ -47,15 +45,14 @@ allLabels = np.unique(y)
 print("Labels present in Dataset: ", allLabels)
 
 cm = np.array([
-#   0  ,1,2,3,4,5,6,7,8,9
     [1,   0,   0,   0,   0,   0,   0,   0,   0,   0],   
-    [0, 0.8,   0,   0,   0,   0,   0, 0.2,   0,   0],   
+    [0, 0.5,   0,   0,   0,   0,   0, 0.5,   0,   0],   
     [0,   0,   1,   0,   0,   0,   0,   0,   0,   0],   
     [0,   0,   0,   1,   0,   0,   0,   0,   0,   0],   
     [0,   0,   0,   0,   1,   0,   0,   0,   0,   0],   
     [0,   0,   0,   0,   0,   1,   0,   0,   0,   0],   
     [0,   0,   0,   0,   0,   0,   1,   0,   0,   0],   
-    [0, 0.1,   0,   0,   0,   0,   0, 0.9,   0,   0],   
+    [0,   0,   0,   0,   0,   0,   0,   1,   0,   0],   
     [0,   0,   0,   0,   0,   0,   0,   0,   1,   0],   
     [0,   0,   0,   0,   0,   0,   0,   0,   0,   1]
 ])
