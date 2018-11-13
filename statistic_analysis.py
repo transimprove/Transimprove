@@ -10,7 +10,7 @@ def rate_annotations_by_datapoint(annotations: np.ndarray) -> pd.DataFrame:
 
 def certain_uncertain_split(rated_annotations: pd.DataFrame, threshold: float) -> (pd.DataFrame, pd.DataFrame):
     certain_labels = rated_annotations.max(axis=1) >= threshold
-    return rated_annotations[certain_labels], rated_annotations[certain_labels==False]
+    return rated_annotations[certain_labels], rated_annotations[certain_labels is False]
 
 
 def transform_majority_label(rated_annotations: pd.DataFrame) -> pd.DataFrame:

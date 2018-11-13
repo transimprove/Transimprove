@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-from CreateDistributedLabels import generate_new_labels_confusionmatrix
+from create_distributed_labels import generate_new_labels_confusionmatrix
 from statistic_analysis import rate_annotations_by_datapoint
 
 from sklearn.datasets import load_iris, load_digits
