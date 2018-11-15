@@ -6,8 +6,8 @@ import random
 
 from statistic_analysis import rate_annotations_by_datapoint, transform_majority_label, certain_uncertain_split
 
-df = pd.DataFrame(data={'datapoint_id': ['a', 'a', 'a', 'b', 'a', 'b', 'b'],
-                        'annotation': ['1', '1', '7', '5', '1', '5', '5']})
+df = pd.DataFrame(data={'datapoint_id': ['a', 'a', 'a', 'b', 'a', 'b', 'b','c','c'],
+                        'annotation': ['1', '1', '7', '5', '1', '5', '5','1', '5']})
 
 df = rate_annotations_by_datapoint(df)
 print('--------------Input-----------------')
