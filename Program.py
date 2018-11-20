@@ -2,7 +2,7 @@ import numpy as np
 
 
 from create_distributed_labels import generate_new_labels_confusionmatrix
-from statistic_analysis import rate_annotations_by_datapoint, certain_uncertain_split, transform_majority_label
+from Transimprove.statistic_analysis import rate_annotations_by_datapoint, certain_uncertain_split, transform_majority_label
 
 from sklearn.datasets import load_iris, load_digits
 X, y = load_iris(True)
