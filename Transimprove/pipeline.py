@@ -40,11 +40,9 @@ class Pipeline:
         self.__calculate_certain_uncertain_split(threshold)
 
     def certain_data_set(self, return_X_y=False, threshold: float = None):
-        #Fit if threshold given and invalidated
+        #TODO Fit if threshold given and invalidated
         id_label = np.array(transform_majority_label(self.certain_split).reset_index().values)
-        debug = self.__datapoints
-        # data = self.__datapoints.loc[id_label[:, 0]]
-        data = debug.loc[id_label[:, 0]]
+        data = self.__datapoints.loc[id_label[:, 0]]
         if return_X_y:
             return (data.values, np.atleast_2d(id_label[:,1]).T)
         else:
