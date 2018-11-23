@@ -1,11 +1,14 @@
 import pandas as pd
 import numpy as np
 
+from Transimprove.pipeline import Pipeline
 from Transimprove.statistic_analysis import rate_annotations_by_datapoint, transform_majority_label, certain_uncertain_split
 
-df_annotations = pd.DataFrame(data={'datapoint_id': ['a', 'a', 'a', 'b', 'a', 'b', 'b', 'c', 'c'],
-                        'annotation': ['1', '1', '7', '5', '1', '5', '5','1', '5']})
-df_data = pd.DataFrame(index=['a', 'b', 'c'], data=['1', '2', '3'])
+df_annotations = pd.DataFrame(data={'datapoint_id': ['a',  'a',  'a',  'a',      'b',  'b',  'b',          'c',  'c'],
+                                      'annotation': ['L1', 'L1', 'L7', 'L1',     'L5', 'L5', 'L5',         'L1', 'L5']})
+df_data = pd.DataFrame(index=['a', 'b', 'c'], data=[['Data for a', 'Data2 for a'],
+                                                    ['Data for b', 'Data2 for b'],
+                                                    ['Data for c', 'Data2 for c']])
 
 
 df = rate_annotations_by_datapoint(df_annotations)
@@ -30,6 +33,21 @@ print(np.array(majority_labels.reset_index().values))
 print('-----------Uncertain Datapoints from original Data-----------')
 df_for_model = df_data[df_data.index.isin(uncertain.index.values)]
 print(df_for_model.reset_index().values);
+
+
+print('-----------Pipeline Implementation-----------')
+datapoints = np.array(df_data.reset_index().values)
+annotation = np.array(df_annotations.values)
+testPipeline = Pipeline(datapoints, annotation, None)
+testPipeline.fit(0.75)
+print(testPipeline.certain_data_set())
+X, y = testPipeline.certain_data_set(return_X_y=True)
+print(X)
+print(y)
+
+
+
+
 
 
 print('-----------Comple Sklearn MLP-----------')
