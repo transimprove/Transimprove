@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 
-from Transimprove.pipeline import Pipeline
+from Testing.DumpAdaptor import DumpAdaptor
+from Transimprove.Pipeline import Pipeline
 from Transimprove.statistic_analysis import rate_annotations_by_datapoint, transform_majority_label, certain_uncertain_split
 
 df_annotations = pd.DataFrame(data={'datapoint_id': ['a',  'a',  'a',  'a',      'b',  'b',  'b',          'c',  'c'],
@@ -12,17 +13,19 @@ df_data = pd.DataFrame(index=['a', 'b', 'c'], data=[['Data for a', 'Data2 for a'
 
 
 df = rate_annotations_by_datapoint(df_annotations)
-print('--------------Input-----------------')
+print('\n\n\n\n\n')
+print('============================Input================================-')
 print(df)
 
 certain, uncertain = certain_uncertain_split(df, 0.9)
+print('\n\n\n\n\n')
 print('--------------Certain Split-----------------')
 print(certain)
 print('--------------Uncertain Split-----------------')
 print(uncertain)
 
 majority_labels = transform_majority_label(certain)
-print('--------------Majority Annotation-----------------')
+print('--------------Majority Annotation--------------')
 print(majority_labels)
 print('-----------Majority Annotation (as np.array)-----------')
 print(np.array(majority_labels.reset_index().values))
@@ -34,16 +37,19 @@ print('-----------Uncertain Datapoints from original Data-----------')
 df_for_model = df_data[df_data.index.isin(uncertain.index.values)]
 print(df_for_model.reset_index().values);
 
-
-print('-----------Pipeline Implementation-----------')
+print('\n\n\n\n\n')
+print('======================Pipeline Implementation======================')
 datapoints = np.array(df_data.reset_index().values)
 annotation = np.array(df_annotations.values)
-testPipeline = Pipeline(datapoints, annotation, None)
+testPipeline = Pipeline(datapoints, annotation, [('Dumb adaptor', DumpAdaptor('DumbLabel'))])
 testPipeline.fit(0.75)
+print('Certain------------')
 print(testPipeline.certain_data_set())
-X, y = testPipeline.certain_data_set(return_X_y=True)
-print(X)
-print(y)
+print('Uncertain----------')
+print(testPipeline.uncertain_data_set())
+print('Full---------------')
+print(testPipeline.full_data_set())
+
 
 
 
