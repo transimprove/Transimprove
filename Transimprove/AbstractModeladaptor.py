@@ -5,10 +5,9 @@ class AbstractModeladaptor:
     model = None
     dict = None
 
-    def __init__(self, model=None, translation_dictionary=None, default=None ):
+    def __init__(self, model=None, translation_dictionary=None):
         self.model = model
         self.dict = translation_dictionary
-        self.default = default
 
     def predict(self, X):
         x = self.preprocess(X)
@@ -22,4 +21,4 @@ class AbstractModeladaptor:
         return self.model.predict(x)
 
     def label_transform(self, y):
-        return np.vectorize(lambda model_output: self.dict.get(model_output,self.default))(y)
+        return np.vectorize(lambda model_output: self.dict.get(model_output,None))(y)
