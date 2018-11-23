@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 
-from Testing.DumpAdaptor import DumpAdaptor
+from Testing.DumpModel import DumpModel
+from Transimprove.AbstractModeladaptor import AbstractModeladaptor
 from Transimprove.Pipeline import Pipeline
 from Transimprove.statistic_analysis import rate_annotations_by_datapoint, transform_majority_label, certain_uncertain_split
 
@@ -41,7 +42,14 @@ print('\n\n\n\n\n')
 print('======================Pipeline Implementation======================')
 datapoints = np.array(df_data.reset_index().values)
 annotation = np.array(df_annotations.values)
-testPipeline = Pipeline(datapoints, annotation, [('Dumb adaptor', DumpAdaptor('DumbLabel'))])
+myAdaptor1 = AbstractModeladaptor(model=DumpModel('DumbLabel'), translation_dictionary={'DumbLabel': 'L1'})
+myAdaptor2 = AbstractModeladaptor(model=DumpModel('DumbLabel'), translation_dictionary={'DumbLabel': 'L1'})
+myAdaptor3 = AbstractModeladaptor(model=DumpModel('DumbLabel'), translation_dictionary={'DumbLabel': 'L2'})
+
+testPipeline = Pipeline(datapoints, annotation, [('Dumb adaptor1', myAdaptor1),
+                                                 ('Dumb adaptor2', myAdaptor2),
+                                                 ('Dumb adaptor3', myAdaptor3)
+                                                 ])
 testPipeline.fit(0.75)
 print('Certain------------')
 print(testPipeline.certain_data_set())
