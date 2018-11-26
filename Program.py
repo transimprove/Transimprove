@@ -12,8 +12,8 @@ from sklearn import svm, metrics, neural_network
 X, y = load_digits(return_X_y=True)
 print("Dataset size", X.shape)
 
-X_existing_model, X_unseen, y_existing_model, y_unseen = train_test_split(X, y, test_size=0.50, random_state=42)
-X_to_annotate, X_test, y_train_unknown, y_test = train_test_split(X_unseen, y_unseen, test_size=0.33, random_state=42)
+X_existing_model, X_unseen, y_existing_model, y_unseen = train_test_split(X, y, test_size=0.90, random_state=42)
+X_to_annotate, X_test, y_train_unknown, y_test = train_test_split(X_unseen, y_unseen, test_size=0.40, random_state=42)
 
 
 def classifier_report(classifier, X, y):
