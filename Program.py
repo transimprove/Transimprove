@@ -1,10 +1,11 @@
 import numpy as np
 
-
-from create_distributed_labels import generate_new_labels_confusionmatrix
 from Transimprove.statistic_analysis import rate_annotations_by_datapoint, certain_uncertain_split, transform_majority_label
 
 from sklearn.datasets import load_iris, load_digits
+
+from create_distributed_labels import generate_new_annotations_confusionmatrix
+
 X, y = load_iris(True)
 X, y = load_digits(return_X_y=True)
 
@@ -28,7 +29,7 @@ cm = np.array([
     [0,   0,   0,   0,   0,   0,   0,   0,   1,   0],   
     [0,   0,   0,   0,   0,   0,   0,   0,   0,   1]
 ])
-annotations = generate_new_labels_confusionmatrix(cm, allLabels, y, count=1000, normalize=False)
+annotations = generate_new_annotations_confusionmatrix(cm, allLabels, y, count=1000, normalize=False)
 
 #Test
 print("--------------Annotation counts per Label--------------------")
