@@ -74,5 +74,10 @@ class Pipeline:
         else:
             return np.hstack((data.values, np.atleast_2d(id_label[:,1]).T))
 
-    def full_data_set(self, threshold: float=None):
-        return np.vstack((self.certain_data_set(threshold=threshold), self.uncertain_data_set(threshold=threshold)))
+    def full_data_set(self, return_X_y=False, threshold: float=None):
+        if return_X_y:
+            X_certain, y_certain = self.certain_data_set(return_X_y=True, threshold=threshold)
+            X_uncertain, y_uncertain = self.uncertain_data_set(return_X_y=True, threshold=threshold)
+            return np.vstack((X_certain, X_uncertain)), np.vstack((y_certain, y_uncertain))
+        else:
+            return np.vstack((self.certain_data_set(threshold=threshold), self.uncertain_data_set(threshold=threshold)))
