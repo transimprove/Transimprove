@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from matplotlib.pyplot import plot, show, savefig
 
 from Transimprove.Pipeline import Pipeline
 from create_distributed_labels import generate_new_labels_confusionmatrix
@@ -42,14 +43,14 @@ allLabels = np.unique(y_train_unknown)
 cm = np.array([
   # ['0', 1,   2,   3,   4    5    6    7    8    9]
     [1,   0,   0,   0,   0,   0,   0,   0,   0,   0],   # 0
-    [0, 0.5,   0,   0,   0,   0,   0, 0.5,   0,   0],   # 1
+    [0, 0.7,   0,   0,   0,   0,   0, 0.3,   0,   0],   # 1
     [0,   0,   1,   0,   0,   0,   0,   0,   0,   0],   # 2
     [0,   0,   0,   1,   0,   0,   0,   0,   0,   0],   # 3
     [0,   0,   0,   0,   1,   0,   0,   0,   0,   0],   # 4
     [0,   0,   0,   0,   0,   1,   0,   0,   0,   0],   # 5
     [0,   0,   0,   0,   0,   0,   1,   0,   0,   0],   # 6
-    [0, 0.5,   0,   0,   0,   0,   0, 0.5,   0,   0],   # 7
-    [0,   0,   0,   0,   0,   0, 0.2,   0, 0.5, 0.3],   # 8
+    [0, 0.3,   0,   0,   0,   0,   0, 0.7,   0,   0],   # 7
+    [0,   0,   0,   0,   0,   0,   0,   0, 0.7, 0.3],   # 8
     [0,   0,   0,   0,   0,   0,   0,   0, 0.3, 0.7]    # 9
 ])
 annotations = generate_new_labels_confusionmatrix(cm, allLabels, y_train_unknown, count=1000, normalize=False)
@@ -67,7 +68,7 @@ print(X_to_annotate_with_id.shape)
 
 transimporve_pipeline = Pipeline(X_to_annotate_with_id, annotations, models=[("MNIST SVM", existing_classifier)])
 
-transimporve_pipeline.fit(0.75)
+transimporve_pipeline.fit(0.70)
 
 print("\n\n\n\n\n==============Classifiert on Certain DS====================")
 X_certain, y_certain = transimporve_pipeline.certain_data_set(return_X_y=True)
@@ -89,3 +90,28 @@ classifier_full = neural_network.MLPClassifier()
 classifier_full.fit(X_full, y_full.ravel())
 classifier_report(classifier_full, X_test, y_test)
 
+
+certainties = np.arange(0.68, 0.98, 0.001)
+scores = []
+for certainty in certainties:
+    transimporve_pipeline.fit(certainty)
+
+    classifier_truth = neural_network.MLPClassifier()
+    classifier_truth.fit(X_to_annotate, y_train_unknown.ravel())
+
+    X_certain, y_certain = transimporve_pipeline.certain_data_set(return_X_y=True)
+    classifier_certain = neural_network.MLPClassifier()
+    classifier_certain.fit(X_certain, y_certain.ravel())
+
+    X_full, y_full = transimporve_pipeline.full_data_set(return_X_y=True)
+    classifier_full = neural_network.MLPClassifier()
+    classifier_full.fit(X_full, y_full.ravel())
+
+    scores.append(classifier_truth.score(X_test, y_test))
+    scores.append(classifier_certain.score(X_test, y_test))
+    scores.append(classifier_full.score(X_test, y_test))
+
+scores = np.array(scores).reshape(len(certainties),3)
+print(scores)
+plot(certainties, scores)
+savefig('Output.png')
