@@ -43,14 +43,14 @@ allLabels = np.unique(y_train_unknown)
 cm = np.array([
   # ['0', 1,   2,   3,   4    5    6    7    8    9]
     [1,   0,   0,   0,   0,   0,   0,   0,   0,   0],   # 0
-    [0, 0.7,   0,   0,   0,   0,   0, 0.3,   0,   0],   # 1
+    [0, 0.5,   0,   0,   0,   0,   0, 0.5,   0,   0],   # 1
     [0,   0,   1,   0,   0,   0,   0,   0,   0,   0],   # 2
     [0,   0,   0,   1,   0,   0,   0,   0,   0,   0],   # 3
     [0,   0,   0,   0,   1,   0,   0,   0,   0,   0],   # 4
     [0,   0,   0,   0,   0,   1,   0,   0,   0,   0],   # 5
     [0,   0,   0,   0,   0,   0,   1,   0,   0,   0],   # 6
-    [0, 0.3,   0,   0,   0,   0,   0, 0.7,   0,   0],   # 7
-    [0,   0,   0,   0,   0,   0,   0,   0, 0.7, 0.3],   # 8
+    [0, 0.5,   0,   0,   0,   0,   0, 0.5,   0,   0],   # 7
+    [0,   0,   0,   0,   0,   0,   0, 0.2, 0.5, 0.3],   # 8
     [0,   0,   0,   0,   0,   0,   0,   0, 0.3, 0.7]    # 9
 ])
 annotations = generate_new_labels_confusionmatrix(cm, allLabels, y_train_unknown, count=1000, normalize=False)
@@ -91,27 +91,26 @@ classifier_full.fit(X_full, y_full.ravel())
 classifier_report(classifier_full, X_test, y_test)
 
 
-certainties = np.arange(0.68, 0.98, 0.001)
-scores = []
+certainties = np.arange(0.5, 0.98, 0.001)
+classes_count = []
 for certainty in certainties:
     transimporve_pipeline.fit(certainty)
 
-    classifier_truth = neural_network.MLPClassifier()
-    classifier_truth.fit(X_to_annotate, y_train_unknown.ravel())
+    X, y = transimporve_pipeline.certain_data_set(return_X_y=True)
 
-    X_certain, y_certain = transimporve_pipeline.certain_data_set(return_X_y=True)
-    classifier_certain = neural_network.MLPClassifier()
-    classifier_certain.fit(X_certain, y_certain.ravel())
+    classes_count.append(np.sum(y==0))
+    classes_count.append(np.sum(y==1))
+    classes_count.append(np.sum(y==2))
+    classes_count.append(np.sum(y==3))
+    classes_count.append(np.sum(y==4))
+    classes_count.append(np.sum(y==5))
+    classes_count.append(np.sum(y==6))
+    classes_count.append(np.sum(y==7))
+    classes_count.append(np.sum(y==8))
+    classes_count.append(np.sum(y==9))
 
-    X_full, y_full = transimporve_pipeline.full_data_set(return_X_y=True)
-    classifier_full = neural_network.MLPClassifier()
-    classifier_full.fit(X_full, y_full.ravel())
 
-    scores.append(classifier_truth.score(X_test, y_test))
-    scores.append(classifier_certain.score(X_test, y_test))
-    scores.append(classifier_full.score(X_test, y_test))
-
-scores = np.array(scores).reshape(len(certainties),3)
-print(scores)
-plot(certainties, scores)
+classes_count = np.array(classes_count).reshape(len(certainties),10)
+print(classes_count)
+plot(certainties, classes_count)
 savefig('Output.png')
