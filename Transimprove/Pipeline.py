@@ -6,7 +6,7 @@ def transform_majority_label(rated_annotations: pd.DataFrame) -> pd.Series:
     return rated_annotations.idxmax(axis=1)
 
 
-class Pipeline():
+class Pipeline:
     __datapoints: pd.DataFrame
     __annotations: pd.DataFrame
     __invalidated: bool

@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class AbstractModeladaptor:
+class AbstractModeladaptor(object):
     model = None
     dict = None
 
