@@ -1,10 +1,9 @@
 import numpy as np
 import pandas as pd
-from matplotlib.pyplot import plot, show, savefig
+from matplotlib.pyplot import plot, savefig
 
 from Transimprove.Pipeline import Pipeline
-from create_distributed_labels import generate_new_labels_confusionmatrix
-from Transimprove.statistic_analysis import rate_annotations_by_datapoint, certain_uncertain_split, transform_majority_label
+from Experiments.Helpers.create_distributed_labels import generate_new_labels_confusionmatrix
 
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
