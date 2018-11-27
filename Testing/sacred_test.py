@@ -1,14 +1,19 @@
+import os
 import random
 import time
+from pathlib import Path
 
 from numpy.random import permutation
-from pymongo import MongoClient
 from sacred.observers import MongoObserver
 from sklearn import svm, datasets
 from sacred import Experiment
+from dotenv import load_dotenv
+from config import ROOT_DIR
 
 ex = Experiment('iris_rbf_svm')
-uri = "mongodb://sample:password@localhost:50101/db?authSource=admin"
+load_dotenv()
+mongodb_port = os.getenv("MONGO_DB_PORT")
+uri = "mongodb://sample:password@localhost:" + str(mongodb_port) + "/db?authSource=admin"
 ex.observers.append(MongoObserver.create(url=uri, db_name='db'))
 
 
