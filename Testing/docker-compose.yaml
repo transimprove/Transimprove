@@ -4,11 +4,13 @@ services:
   mongo:
     image: mongo
     ports:
-      - 27017:27017
+      - 50101:27017
     environment:
       MONGO_INITDB_ROOT_USERNAME: sample
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_DATABASE: db
+    volumes:
+      - /IP5_DataQuality/docker/mongodata:/data/db
     expose:
       - 27017
     networks:
@@ -20,7 +22,7 @@ services:
     networks:
       - sacred
     ports:
-      - 9000:9000
+      - 50100:9000
     depends_on:
       - mongo
 

@@ -8,7 +8,7 @@ from sklearn import svm, datasets
 from sacred import Experiment
 
 ex = Experiment('iris_rbf_svm')
-uri = "mongodb://sample:password@localhost:27017/db?authSource=admin"
+uri = "mongodb://sample:password@localhost:50101/db?authSource=admin"
 ex.observers.append(MongoObserver.create(url=uri, db_name='db'))
 
 
