@@ -55,6 +55,8 @@ class Pipeline:
             self.fit(threshold)
 
         id_label = np.array(transform_majority_label(self.certain_split).reset_index().values)
+        if id_label.size == 0:
+            return None
         data = self.__datapoints.loc[id_label[:, 0]]
         if return_X_y:
             return (data.values, np.atleast_2d(id_label[:,1]).T)
@@ -68,6 +70,9 @@ class Pipeline:
             self.fit(threshold)
 
         id_label = np.array(self.model_predictions.mode(axis=1).reset_index().values)
+        if id_label.size == 0:
+            return None
+
         data = self.__datapoints.loc[id_label[:, 0]]
         if return_X_y:
             return (data.values, np.atleast_2d(id_label[:,1]).T)
@@ -78,6 +83,18 @@ class Pipeline:
         if return_X_y:
             X_certain, y_certain = self.certain_data_set(return_X_y=True, threshold=threshold)
             X_uncertain, y_uncertain = self.uncertain_data_set(return_X_y=True, threshold=threshold)
-            return np.vstack((X_certain, X_uncertain)), np.vstack((y_certain, y_uncertain))
+            if X_certain is None:
+                return X_uncertain, y_certain
+            elif X_uncertain is None:
+                return X_certain, y_uncertain
+            else:
+                return np.vstack((X_certain, X_uncertain)), np.vstack((y_certain, y_uncertain))
         else:
-            return np.vstack((self.certain_data_set(threshold=threshold), self.uncertain_data_set(threshold=threshold)))
+            X_y_certain = self.certain_data_set(threshold=threshold)
+            X_y_uncertain = self.uncertain_data_set(threshold=threshold)
+            if X_y_certain is None:
+                return X_y_uncertain
+            elif X_y_uncertain is None:
+                return X_y_certain
+            else:
+                return np.vstack((X_y_certain,X_y_uncertain))
