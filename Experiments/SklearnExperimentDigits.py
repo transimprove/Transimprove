@@ -3,7 +3,7 @@ import pandas as pd
 from matplotlib.pyplot import plot, savefig
 
 from Transimprove.Pipeline import Pipeline
-from Experiments.Helpers.create_distributed_labels import generate_new_annotations_confusionmatrix
+from Experiments.util.create_distributed_labels import generate_new_annotations_confusionmatrix
 
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
