@@ -40,12 +40,14 @@ class Pipeline:
     def fit(self, threshold: float):
         self.__calculate_certain_uncertain_split(threshold)
         ids_uncertain = self.uncertain_split.index.values
-        model_predictions = pd.DataFrame(index=ids_uncertain)
-        data = self.__datapoints.loc[ids_uncertain].values
-        for name, adaptor in self.model_adaptors:
-            y = adaptor.predict(data)
-            model_predictions.loc[ids_uncertain, name] = y
-        self.model_predictions = model_predictions
+        self.model_predictions = None
+        if ids_uncertain.size > 0:
+            model_predictions = pd.DataFrame(index=ids_uncertain)
+            data = self.__datapoints.loc[ids_uncertain].values
+            for name, adaptor in self.model_adaptors:
+                y = adaptor.predict(data)
+                model_predictions.loc[ids_uncertain, name] = y
+            self.model_predictions = model_predictions
         self.__invalidated = False
 
     def certain_data_set(self, return_X_y=False, threshold: float = None):
@@ -56,7 +58,7 @@ class Pipeline:
 
         id_label = np.array(transform_majority_label(self.certain_split).reset_index().values)
         if id_label.size == 0:
-            return None
+            return (None, None) if return_X_y else None
         data = self.__datapoints.loc[id_label[:, 0]]
         if return_X_y:
             return (data.values, np.atleast_2d(id_label[:,1]).T)
@@ -69,9 +71,11 @@ class Pipeline:
         elif self.__invalidated:
             self.fit(threshold)
 
+        if self.model_predictions is None:
+            return (None, None) if return_X_y else None
         id_label = np.array(self.model_predictions.mode(axis=1).reset_index().values)
-        if id_label.size == 0:
-            return None
+        if id_label.shape[1] != 2:
+            return (None, None) if return_X_y else None
 
         data = self.__datapoints.loc[id_label[:, 0]]
         if return_X_y:
@@ -84,9 +88,9 @@ class Pipeline:
             X_certain, y_certain = self.certain_data_set(return_X_y=True, threshold=threshold)
             X_uncertain, y_uncertain = self.uncertain_data_set(return_X_y=True, threshold=threshold)
             if X_certain is None:
-                return X_uncertain, y_certain
+                return X_uncertain, y_uncertain
             elif X_uncertain is None:
-                return X_certain, y_uncertain
+                return X_certain, y_certain
             else:
                 return np.vstack((X_certain, X_uncertain)), np.vstack((y_certain, y_uncertain))
         else:
@@ -97,4 +101,4 @@ class Pipeline:
             elif X_y_uncertain is None:
                 return X_y_certain
             else:
-                return np.vstack((X_y_certain,X_y_uncertain))
+                return np.vstack((X_y_certain, X_y_uncertain))

@@ -90,7 +90,7 @@ classifier_full.fit(X_full, y_full.ravel())
 classifier_report(classifier_full, X_test, y_test)
 
 
-certainties = np.arange(0.68, 0.98, 0.001)
+certainties = np.arange(0.4, 1.0, 0.01)
 scores = []
 for certainty in certainties:
     transimporve_pipeline.fit(certainty)
@@ -99,15 +99,19 @@ for certainty in certainties:
     classifier_truth.fit(X_to_annotate, y_train_unknown.ravel())
 
     X_certain, y_certain = transimporve_pipeline.certain_data_set(return_X_y=True)
-    classifier_certain = neural_network.MLPClassifier()
-    classifier_certain.fit(X_certain, y_certain.ravel())
+    if not X_certain is None:
+        classifier_certain = neural_network.MLPClassifier()
+        classifier_certain.fit(X_certain, y_certain.ravel())
 
     X_full, y_full = transimporve_pipeline.full_data_set(return_X_y=True)
     classifier_full = neural_network.MLPClassifier()
     classifier_full.fit(X_full, y_full.ravel())
 
     scores.append(classifier_truth.score(X_test, y_test))
-    scores.append(classifier_certain.score(X_test, y_test))
+    if X_certain is None:
+        scores.append(0.0)
+    else:
+        scores.append(classifier_certain.score(X_test, y_test))
     scores.append(classifier_full.score(X_test, y_test))
 
 scores = np.array(scores).reshape(len(certainties),3)
