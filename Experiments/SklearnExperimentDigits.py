@@ -12,10 +12,10 @@ from sklearn import svm, neural_network
 from matplotlib import pyplot as plt
 
 from Transimprove.Pipeline import Pipeline
-from create_distributed_labels import generate_new_annotations_confusionmatrix
+from Experiments.util.create_distributed_labels import generate_new_annotations_confusionmatrix
 from yellowbrick.classifier import ClassificationReport
 
-from experiments.util.pretty_print_confusion_matrix import plot_confusion_matrix_from_data
+from Experiments.util.pretty_print_confusion_matrix import plot_confusion_matrix_from_data
 
 ex = Experiment('SklearnProofOfConcept')
 load_dotenv()
@@ -44,8 +44,8 @@ def cfg():
         [0, 0, 0, 0, 0, 0, 0, 0, 0.7, 0.3],  # 8
         [0, 0, 0, 0, 0, 0, 0, 0, 0.3, 0.7]  # 9
     ])
-    consistency_min = 0.68
-    consistency_max = 0.98
+    consistency_min = 0.4
+    consistency_max = 1.0
     annotations_per_label = 1000
 
 
@@ -77,18 +77,24 @@ def compute_scores(X_test, X_to_annotate, consistencies, transimporve_pipeline, 
     scores = []
     for consistency in consistencies:
         transimporve_pipeline.fit(consistency)
+
         classifier_truth = neural_network.MLPClassifier()
         classifier_truth.fit(X_to_annotate, y_train_unknown.ravel())
-        scores.append(classifier_truth.score(X_test, y_test))
 
         X_certain, y_certain = transimporve_pipeline.certain_data_set(return_X_y=True)
-        classifier_certain = neural_network.MLPClassifier()
-        classifier_certain.fit(X_certain, y_certain.ravel())
-        scores.append(classifier_certain.score(X_test, y_test))
+        if not X_certain is None:
+            classifier_certain = neural_network.MLPClassifier()
+            classifier_certain.fit(X_certain, y_certain.ravel())
 
         X_full, y_full = transimporve_pipeline.full_data_set(return_X_y=True)
         classifier_full = neural_network.MLPClassifier()
         classifier_full.fit(X_full, y_full.ravel())
+
+        scores.append(classifier_truth.score(X_test, y_test))
+        if X_certain is None:
+            scores.append(0.0)
+        else:
+            scores.append(classifier_certain.score(X_test, y_test))
         scores.append(classifier_full.score(X_test, y_test))
     return scores
 
