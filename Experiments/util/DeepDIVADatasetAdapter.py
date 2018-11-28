@@ -2,11 +2,11 @@ import os
 import numpy as np
 
 
-class DeepDIVADatasetAdaptor:
+class DeepDIVADatasetAdapter(object):
     def __init__(self, input_dir):
         self.root = input_dir
 
-    #return [[path, label],
+    # return [[path, label],
     #        [path2], label]
     def read_folder_dataset(self, subfolder="train"):
         dataset_root = os.path.join(self.root, subfolder)
@@ -18,7 +18,7 @@ class DeepDIVADatasetAdaptor:
                 dataset.append(os.path.join(label_path, picture))
                 dataset.append(label)
 
-        return np.array(dataset).reshape(len(dataset)//2, 2)
+        return np.array(dataset).reshape(len(dataset) // 2, 2)
 
     def create_symlink_dataset(self, dataset, output_dir, subfolder='train'):
         for picture_path, label in dataset:

@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from Experiments.util.experiment import Experiment
+from Experiments.util.resource import Resource
 from Experiments.util.DeepDIVADatasetAdapter import DeepDIVADatasetAdaptor
 from Testing.DumpModel import DumpModel
 from Transimprove.AbstractModeladaptor import AbstractModeladaptor
@@ -43,9 +43,6 @@ class DeepDivaMnistExperiment:
         # X_y = self.adaptor.read_folder_dataset(subfolder='original_train')
         # X_y_test = self.adaptor.read_folder_dataset(subfolder='test')
         # X_y_existing_model, X_y_remaining = train_test_split(X_y, test_size=0.70, random_state=42)
-        #
-        # self.train_exising_model(X_y_existing_model, X_y_test)
-        # self.train_ground_truth_model(X_y_remaining, X_y_test)
 
 
 # =================================Test Data===================
