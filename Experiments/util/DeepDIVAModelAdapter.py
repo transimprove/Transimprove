@@ -1,11 +1,12 @@
 import sys
+import glob
+import numpy as np
 
 from Experiments.util.DeepDIVADatasetAdapter import DeepDIVADatasetAdapter
 
 sys.path.append("/deepdiva/")
 import os
 
-import numpy as np
 
 from template.RunMe import RunMe
 
@@ -42,19 +43,21 @@ class DeepDIVAModelAdapter(object):
         self.data_adapter.create_symlink_dataset(dataset, data_root_dir, subfolder=self.EVALUATE_SUBFOLDER)
 
     def apply_model(self, data_root_dir):
+        best_model = glob.glob(os.path.join(self.dir,'**','model_best.pth.tar'), recursive=True)
         args = ["--experiment-name", "evaluation",
                 "--runner-class", "apply_model",
                 "--dataset-folder", data_root_dir,
                 "--output-folder", data_root_dir,
-                "--load-model", self.dir,
+                "--load-model", best_model[0],
                 "--ignoregit",
                 "--no-cuda",
                 "--classify"]
         RunMe().main(args=args)
 
     def read_output(self, X, data_root_dir):
-        #TODO Read OUTPUT file and match y with X
-        pass
+        output = glob.glob(os.path.join(data_root_dir,'evaluation', '**', self.OUTPUT), recursive=True)[0]
+        print("result file found at ", output)
+        # TODO pase output
 
 
 if __name__ == '__main__':
