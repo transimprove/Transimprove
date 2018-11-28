@@ -27,4 +27,6 @@ class DeepDIVADatasetAdaptor:
             os.makedirs(label_dir, exist_ok=True)
             os.symlink(picture_path, os.path.join(label_dir, filename))
 
-
+    def copy_symlink(self, output_dir, subfolder='train'):
+        ds = self.read_folder_dataset(subfolder)
+        self.create_symlink_dataset(ds, output_dir, subfolder)

@@ -3,7 +3,7 @@ import pandas as pd
 from matplotlib.pyplot import plot, savefig
 
 from Transimprove.Pipeline import Pipeline
-from Experiments.Helpers.create_distributed_labels import generate_new_labels_confusionmatrix
+from Experiments.Helpers.create_distributed_labels import generate_new_annotations_confusionmatrix
 
 from sklearn.datasets import load_digits
 from sklearn.model_selection import train_test_split
@@ -52,7 +52,7 @@ cm = np.array([
     [0,   0,   0,   0,   0,   0,   0,   0, 0.7, 0.3],   # 8
     [0,   0,   0,   0,   0,   0,   0,   0, 0.3, 0.7]    # 9
 ])
-annotations = generate_new_labels_confusionmatrix(cm, allLabels, y_train_unknown, count=1000, normalize=False)
+annotations = generate_new_annotations_confusionmatrix(cm, allLabels, y_train_unknown, count=1000, normalize=False)
 print('Shape of Annnotations', annotations.shape)
 for label in allLabels:
     print(label ," count: ",np.sum(annotations[:,1] == label))
