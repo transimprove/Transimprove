@@ -1,0 +1,14 @@
+version: "3"
+services:
+  mongo:
+    image: mongo
+    networks:
+      - sacred
+  omniboard:
+    image: vivekratnavel/omniboard
+    networks:
+      - sacred
+    depends_on:
+      - mongo
+networks:
+  sacred:
