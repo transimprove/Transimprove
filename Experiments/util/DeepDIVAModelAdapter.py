@@ -28,20 +28,23 @@ class DeepDIVAModelAdapter(object):
         self.data_adapter = data_adapter
 
     def train(self):
+        self.classes = sorted(os.listdir(os.path.join(self.dir, self.TRAIN_SUBFOLDER)))
         args = ["--experiment-name", "DeepDivaModelAdapter_train",
                 "--output-folder", os.path.join(self.dir, self.MODEL_LOG),
                 "--dataset-folder", self.dir,
                 "--lr", "0.1",
                 "--ignoregit",
                 "--no-cuda"]
-        self.classes = os.listdir(os.path.join(self.dir))
         return RunMe().main(args=args)
 
     # X is a list of paths of images
     def predict(self, X, data_root_dir):
-        self.copy_to_evaluate(X[:, 0], data_root_dir)
+        self.classes = sorted(os.listdir(os.path.join(self.dir, self.TRAIN_SUBFOLDER)))
+        files_list = X[:, 0]
+        self.copy_to_evaluate(files_list, data_root_dir)
         self.apply_model(data_root_dir)
-        return self.read_output(X, data_root_dir)
+        classification_results = self.read_output(data_root_dir)
+        return self.map_dataset(files_list, classification_results)
 
     def copy_to_evaluate(self, X, data_root_dir):
         dataset = np.vstack((np.atleast_2d(X), np.repeat(self.DUMMY_LABEL, len(X)))).T
@@ -58,26 +61,41 @@ class DeepDIVAModelAdapter(object):
                 "--load-model", best_model[0],
                 "--ignoregit",
                 "--no-cuda",
-                "--output-channels", '10']
+                "--output-channels", len(self.classes).__str__()]
         RunMe().main(args=args)
 
-    def read_output(self, X, data_root_dir):
+    def read_output(self, data_root_dir):
         output = glob(os.path.join(data_root_dir,self.EVALUATION_LOG, '**', self.EVALUATION_OUTPUT_FILE), recursive=True)[0]
-        print("result file found at ", output)
         with open(output, 'rb') as file:
             data = pickle.load(file)
 
-        print("features: ", (data[0].shape))
-        print("labels", np.unique(np.argmax(data[0], axis=1)))
-        # print("filenames: ", np.unique(data[3]))
-        # TODO pase output
+        X = data[3]
+        y = np.argmax(data[0], axis=1)
+        return np.vstack((X,y)).T
+
+
+    def map_dataset(self, X, classification_results):
+        #X = [['/.../label/picture.png'],
+        #     ['/.../label/picture2.png']]
+        #results_dataset = [['/.../dummy/picture.png','label'],
+        #                   ['/.../dummy/picture2.png','label']]
+        X = pd.DataFrame(np.atleast_2d(X).T, columns=['Original_files'])
+        X['Original_files'] = X['Original_files'].apply(lambda path: os.path.basename(path))
+
+        y = pd.DataFrame(classification_results, columns=['Copied_files', 'Label_index'])
+        y['Copied_files'] = y['Copied_files'].apply(lambda path: os.path.basename(path))
+        y['Label_index'] = y.Label_index.astype(int)
+        y['Label'] = y['Label_index'].apply(lambda index: self.classes[index])
+
+        merged = pd.merge(X,y,how='left',left_on=['Original_files'], right_on=['Copied_files'])
+        return merged['Label'].values
 
 
 if __name__ == '__main__':
     remove_existing = False
     remove_someother = True
 
-    playground_dir = '/IP5_DataQuality/Playground/'
+    playground_dir = '/IP5_DataQuality/PlaygroundPhilipp/'
     data_adapter = DeepDIVADatasetAdapter('/dd_resources/data/MNIST/')
     ddma = DeepDIVAModelAdapter(playground_dir, data_adapter)
 
@@ -95,7 +113,5 @@ if __name__ == '__main__':
             shutil.rmtree(os.path.join(playground_dir,'someOtherModelDir'))
         # testwise use val as unknown dataset split
         eval_dataset = data_adapter.read_folder_dataset(subfolder='val')
-        print(eval_dataset[:, 0])
         ddma.predict(eval_dataset, os.path.join(playground_dir, 'someOtherModelDir'))
-
-    ddma.read_output([], os.path.join(playground_dir, 'someOtherModelDir'))
+        print(ddma.classes)
