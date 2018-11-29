@@ -54,15 +54,8 @@ class DeepDivaMnistExperiment:
 
 
         print("\n\n\n\n\n==============Train existing model====================")
-        deep_diva_mnist_existing = DeepDIVAModelAdapter(self.dir_existing_model,self.adaptor)
-        X_y_train, X_y_val = train_test_split(X_y_existing_model,test_size=0.2, random_state=42)
-        self.adaptor.create_symlink_dataset(X_y_train, self.dir_existing_model, subfolder='train')
-        self.adaptor.create_symlink_dataset(X_y_val, self.dir_existing_model, subfolder='val')
-        self.adaptor.copy_symlink(self.dir_existing_model,subfolder='test')
-        train, val, test = deep_diva_mnist_existing.train()
-        print(train)
-        print(val)
-        print(test)
+        existing_score, existing_model = self.train_MNIST_DeepDIVA_Model(X_y_existing_model, self.dir_existing_model)
+        print("Score of existing model: ",existing_score)
 
 
         # print("\n\n\n\n\n==============Train truth model====================")
@@ -89,6 +82,15 @@ class DeepDivaMnistExperiment:
         # val =  np.array(val).reshape(len(certainties),2)
 
 
+
+    def train_MNIST_DeepDIVA_Model(self, X_y_data, directory):
+        deep_diva_mnist_model = DeepDIVAModelAdapter(directory, self.adaptor)
+        X_y_train, X_y_val = train_test_split(X_y_data, test_size=0.2, random_state=42)
+        self.adaptor.create_symlink_dataset(X_y_train, directory, subfolder='train')
+        self.adaptor.create_symlink_dataset(X_y_val, directory, subfolder='val')
+        self.adaptor.copy_symlink(self.dir_existing_model, subfolder='test')
+        train, val, test = deep_diva_mnist_model.train()
+        return (test, deep_diva_mnist_model)
 
 
 
