@@ -12,10 +12,10 @@ from sklearn import svm, neural_network
 from matplotlib import pyplot as plt
 
 from Transimprove.Pipeline import Pipeline
-from Experiments.util.create_distributed_labels import generate_new_annotations_confusionmatrix
+from Experiments.helper.create_distributed_labels import generate_new_annotations_confusionmatrix
 from yellowbrick.classifier import ClassificationReport
 
-from Experiments.util.pretty_print_confusion_matrix import plot_confusion_matrix_from_data
+from Experiments.helper.pretty_print_confusion_matrix import plot_confusion_matrix_from_data
 
 ex = Experiment('SklearnProofOfConcept')
 load_dotenv()

@@ -1,15 +1,16 @@
-import sys
+import os
 from glob import glob
 import numpy as np
 import pickle
 import pandas as pd
 import shutil
 
-from Experiments.util.DeepDIVADatasetAdapter import DeepDIVADatasetAdapter
+from Experiments.helper.DeepDIVADatasetAdapter import DeepDIVADatasetAdapter
 
+
+
+import sys
 sys.path.append("/deepdiva/")
-import os
-
 from template.RunMe import RunMe
 
 

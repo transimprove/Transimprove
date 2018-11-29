@@ -4,7 +4,7 @@ import numpy as np
 import uuid
 from datetime import datetime
 
-from config import ROOT_DIR, EXPERIMENTS_PATH
+from config import EXPERIMENTS_PATH
 
 
 class Resource(object):
@@ -13,10 +13,11 @@ class Resource(object):
         self.identifier = uuid.uuid1()
         self.start_time = datetime.now()
         self.objects = []
-        self.dir = os.path.join(ROOT_DIR, EXPERIMENTS_PATH)
+        self.root_dir = os.path.join(EXPERIMENTS_PATH)
 
     def get_experiment_directory(self):
-        return self.dir
+        time_str = self.start_time.strftime('%Y-%m-%d_%H:%M')
+        return os.path.join(self.root_dir, time_str + '_' + str(self.identifier))
 
     def add(self, object_to_add, *argv):
         self.objects.append(object_to_add)
@@ -24,9 +25,8 @@ class Resource(object):
             self.objects.append(object)
 
     def save(self):
-        time = self.start_time.strftime('%Y-%m-%d_%H:%M')
-        filepath = os.path.join(self.dir, time + '_' + str(self.identifier))
+        filepath = os.path.join(self.get_experiment_directory(),'ObjectsSave.npz')
         np.savez(filepath, *self.objects)
-        return filepath + '.npz'
+        return filepath
 
         # creates new folder saves it under 2018-11-23 start_time uuid
