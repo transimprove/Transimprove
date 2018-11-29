@@ -1,22 +1,21 @@
 import sys
-import glob
+from glob import glob
 import numpy as np
+import pickle
+import pandas as pd
 
 from Experiments.util.DeepDIVADatasetAdapter import DeepDIVADatasetAdapter
 
 sys.path.append("/deepdiva/")
 import os
 
-
 from template.RunMe import RunMe
-
 
 
 class DeepDIVAModelAdapter(object):
     EVALUATE_SUBFOLDER = 'to_evaluate'
     MODEL_LOG = 'log'
     OUTPUT = 'results.pkl'
-
 
     def __init__(self, dir, data_adapter: DeepDIVADatasetAdapter):
         self.dir = dir
@@ -29,21 +28,22 @@ class DeepDIVAModelAdapter(object):
                 "--lr", "0.1",
                 "--ignoregit",
                 "--no-cuda"]
-        RunMe().main(args=args)
+        train, val, test = RunMe().main(args=args)
 
     # X is a list of paths of images
     def predict(self, X, data_root_dir, class_dummy_label='0'):
         self.copy_to_evaluate(X, class_dummy_label, data_root_dir)
         self.apply_model(data_root_dir)
-        y = self.read_output(X, data_root_dir)
-        return y
+        return self.read_output(X, data_root_dir)
 
     def copy_to_evaluate(self, X, class_dummy_label, data_root_dir):
         dataset = np.vstack((np.atleast_2d(X), np.repeat(class_dummy_label, len(X)))).T
         self.data_adapter.create_symlink_dataset(dataset, data_root_dir, subfolder=self.EVALUATE_SUBFOLDER)
 
     def apply_model(self, data_root_dir):
-        best_model = glob.glob(os.path.join(self.dir,'**','model_best.pth.tar'), recursive=True)
+        analytics_csv = glob(os.path.join(self.dir,'analytics.csv'))[0]
+        os.symlink(analytics_csv, os.path.join(data_root_dir,'to_evaluate/analytics.csv'))
+        best_model = glob(os.path.join(self.dir, '**', 'model_best.pth.tar'), recursive=True)
         args = ["--experiment-name", "evaluation",
                 "--runner-class", "apply_model",
                 "--dataset-folder", data_root_dir,
@@ -55,23 +55,29 @@ class DeepDIVAModelAdapter(object):
         RunMe().main(args=args)
 
     def read_output(self, X, data_root_dir):
-        output = glob.glob(os.path.join(data_root_dir,'evaluation', '**', self.OUTPUT), recursive=True)[0]
+        output = glob(os.path.join(data_root_dir, 'evaluation', '**', self.OUTPUT), recursive=True)[0]
         print("result file found at ", output)
+        with open(output, 'rb') as file:
+            data = pickle.load(file)
+
+        df = pd.DataFrame(data=np.array([data[1],data[2],data[3]]).T, columns=['Dummy_Predictions', 'Labels','filenames'])
+        print(df.describe())
         # TODO pase output
 
 
 if __name__ == '__main__':
     playground_dir = '/IP5_DataQuality/Playground/'
     data_adapter = DeepDIVADatasetAdapter('/dd_resources/data/MNIST/')
-    data_adapter.copy_symlink(playground_dir, subfolder='train')
-    data_adapter.copy_symlink(playground_dir, subfolder='val')
-    data_adapter.copy_symlink(playground_dir, subfolder='test')
+    # data_adapter.copy_symlink(playground_dir, subfolder='train')
+    # data_adapter.copy_symlink(playground_dir, subfolder='val')
+    # data_adapter.copy_symlink(playground_dir, subfolder='test')
     ddma = DeepDIVAModelAdapter(playground_dir, data_adapter)
-
-    # Run fit
-    ddma.train()
-
-    #testwise use val as unknown dataset split
+    #
+    # # Run fit
+    # ddma.train()
+    #
+    # # testwise use val as unknown dataset split
     eval_dataset = data_adapter.read_folder_dataset(subfolder='val')
-    print(eval_dataset[:,0])
-    ddma.predict(eval_dataset[:,0],os.path.join(playground_dir,'someOtherModelDir'))
+    print(eval_dataset[:, 0])
+    ddma.predict(eval_dataset[:, 0], os.path.join(playground_dir, 'someOtherModelDir'))
+    ddma.read_output([], os.path.join(playground_dir, 'someOtherModelDir'))
