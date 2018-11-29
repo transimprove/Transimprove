@@ -7,12 +7,12 @@ def transform_majority_label(rated_annotations: pd.DataFrame) -> pd.Series:
 
 
 class Pipeline:
-    __datapoints: pd.DataFrame
-    __annotations: pd.DataFrame
-    __invalidated: bool
-    certain_split: pd.DataFrame
-    uncertain_split: pd.DataFrame
-    model_predictions: pd.DataFrame
+    # __datapoints: pd.DataFrame
+    # __annotations: pd.DataFrame
+    # __invalidated: bool
+    # certain_split: pd.DataFrame
+    # uncertain_split: pd.DataFrame
+    # model_predictions: pd.DataFrame
     model_adaptors = None
 
     def __init__(self, datapoints, annotations, models):

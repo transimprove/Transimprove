@@ -9,6 +9,7 @@ from Experiments.helper.create_distributed_labels import  generate_new_annotatio
 
 from sklearn.model_selection import train_test_split
 import config
+from Transimprove.Pipeline import Pipeline
 
 
 class DeepDivaMnistExperiment:
@@ -46,7 +47,7 @@ class DeepDivaMnistExperiment:
         y_labels = X_y_remaining[:, 1]
         allLabels = "0 1 2 3 4 5 6 7 8 9".split(" ")
 
-        annotations = generate_new_annotations_confusionmatrix(self.cm, allLabels, y_labels, count=1000, normalize=False)
+        annotations = generate_new_annotations_confusionmatrix(self.cm, allLabels, y_labels, count=len(y_labels)*3, normalize=False)
         print('Shape of Annnotations', annotations.shape)
         for label in allLabels:
             print(label, " count: ", np.sum(annotations[:, 1] == label))
@@ -56,30 +57,35 @@ class DeepDivaMnistExperiment:
         print("\n\n\n\n\n==============Train existing model====================")
         existing_score, existing_model = self.train_MNIST_DeepDIVA_Model(X_y_existing_model, self.dir_existing_model)
         print("Score of existing model: ",existing_score)
+        y = existing_model.predict(np.atleast_2d(X_y_existing_model[:,0]).T)
+        print(y)
+
+        print("\n\n\n\n\n==============Train truth model====================")
+        possible_score, _ = self.train_MNIST_DeepDIVA_Model(X_y_remaining, self.dir_ground_truth_model)
+        print("Score of truth model: ", possible_score)
 
 
-        # print("\n\n\n\n\n==============Train truth model====================")
-        #
-        #
-        #
-        # print("\n\n\n\n\n==============Pipeline Implementation====================")
-        # print(X_datapoints.shape)
-        # # Adding the ID to columns
-        # datapoints_for_pipeline = np.vstack((np.arange(0, len(X_datapoints)),X_datapoints)).T
-        #
-        # transimporve_pipeline = Pipeline(datapoints_for_pipeline, annotations, models=[('DeepDivaMNIST', deep_diva_mnist)])
-        # certainties = np.arange(0.60, 0.90, 0.1)
-        # train = []
-        # val = []
-        # test = []
-        # for certainty in certainties:
-        #     transimporve_pipeline.fit(certainty)
-        #     train, val, test = self.train_deep_diva_model(transimporve_pipeline.certain_data_set(), os.path.join(certainty, 'certain_ds'))
-        #     train, val, test = self.train_deep_diva_model(transimporve_pipeline.full_data_set(), os.path.join(certainty, 'full_ds'))
-        #
-        # train =  np.array(train).reshape(len(certainties),2)
-        # test =  np.array(test).reshape(len(certainties),2)
-        # val =  np.array(val).reshape(len(certainties),2)
+        print("\n\n\n\n\n==============Pipeline Implementation====================")
+        print(X_datapoints.shape)
+        # Adding the ID to columns
+        datapoints_for_pipeline = np.vstack((np.arange(0, len(X_datapoints)),X_datapoints)).T
+
+        transimporve_pipeline = Pipeline(datapoints_for_pipeline, annotations, models=[('DeepDivaMNIST', existing_model)])
+        certainties = np.arange(0.60, 0.90, 0.1)
+        scores = []
+        test = []
+        for certainty in certainties:
+            transimporve_pipeline.fit(certainty)
+            score_certain, _ = self.train_MNIST_DeepDIVA_Model(transimporve_pipeline.certain_data_set(), os.path.join(self.this_resource.get_experiment_directory() ,str(certainty), 'certain_ds'))
+            score_full, _ = self.train_MNIST_DeepDIVA_Model(transimporve_pipeline.full_data_set(), os.path.join(self.this_resource.get_experiment_directory() ,str(certainty), 'full_ds'))
+            scores.append(score_certain)
+            scores.append(score_full)
+
+        scores = np.array(scores).reshape(len(certainties),2)
+        print(scores)
+        self.this_resource.add(scores)
+        self.this_resource.save()
+
 
 
 
@@ -88,7 +94,7 @@ class DeepDivaMnistExperiment:
         X_y_train, X_y_val = train_test_split(X_y_data, test_size=0.2, random_state=42)
         self.adaptor.create_symlink_dataset(X_y_train, directory, subfolder='train')
         self.adaptor.create_symlink_dataset(X_y_val, directory, subfolder='val')
-        self.adaptor.copy_symlink(self.dir_existing_model, subfolder='test')
+        self.adaptor.copy_symlink(directory, subfolder='test')
         train, val, test = deep_diva_mnist_model.train()
         return (test, deep_diva_mnist_model)
 

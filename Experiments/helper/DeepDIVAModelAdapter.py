@@ -5,6 +5,8 @@ import pickle
 import pandas as pd
 import shutil
 
+import uuid
+
 from Experiments.helper.DeepDIVADatasetAdapter import DeepDIVADatasetAdapter
 
 
@@ -39,7 +41,8 @@ class DeepDIVAModelAdapter(object):
         return RunMe().main(args=args)
 
     # X is a list of paths of images
-    def predict(self, X, data_root_dir):
+    def predict(self, X):
+        data_root_dir = os.path.join('/tmp',str(uuid.uuid1()))
         self.classes = sorted(os.listdir(os.path.join(self.dir, self.TRAIN_SUBFOLDER)))
         files_list = X[:, 0]
         self.copy_to_evaluate(files_list, data_root_dir)
