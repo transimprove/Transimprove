@@ -3,6 +3,7 @@ from glob import glob
 import numpy as np
 import pickle
 import pandas as pd
+import shutil
 
 from Experiments.util.DeepDIVADatasetAdapter import DeepDIVADatasetAdapter
 
@@ -75,18 +76,27 @@ class DeepDIVAModelAdapter(object):
 
 
 if __name__ == '__main__':
+    remove_existing = True
+    remove_someother = True
+
     playground_dir = '/IP5_DataQuality/Playground/'
     data_adapter = DeepDIVADatasetAdapter('/dd_resources/data/MNIST/')
-    # data_adapter.copy_symlink(playground_dir, subfolder='train')
-    # data_adapter.copy_symlink(playground_dir, subfolder='val')
-    # data_adapter.copy_symlink(playground_dir, subfolder='test')
     ddma = DeepDIVAModelAdapter(playground_dir, data_adapter)
 
-    # Run fit
-    # ddma.train()
-    #
-    # testwise use val as unknown dataset split
-    eval_dataset = data_adapter.read_folder_dataset(subfolder='val')
-    print(eval_dataset[:, 0])
-    # ddma.predict(eval_dataset[:, 0], os.path.join(playground_dir, 'someOtherModelDir'))
+    if remove_existing:
+        if os.path.exists(playground_dir):
+            shutil.rmtree(playground_dir)
+        data_adapter.copy_symlink(playground_dir, subfolder='train')
+        data_adapter.copy_symlink(playground_dir, subfolder='val')
+        data_adapter.copy_symlink(playground_dir, subfolder='test')
+
+        # Run fit
+        ddma.train()
+    if not os.path.exists(os.path.join(playground_dir,'log')) or remove_someother:
+        shutil.rmtree(os.path.join(playground_dir,'someOtherModelDir'))
+        # testwise use val as unknown dataset split
+        eval_dataset = data_adapter.read_folder_dataset(subfolder='val')
+        print(eval_dataset[:, 0])
+        ddma.predict(eval_dataset[:, 0], os.path.join(playground_dir, 'someOtherModelDir'))
+
     ddma.read_output([], os.path.join(playground_dir, 'someOtherModelDir'))
