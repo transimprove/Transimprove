@@ -29,15 +29,20 @@ class DeepDIVAModelAdapter(object):
                 "--ignoregit",
                 "--no-cuda"]
         train, val, test = RunMe().main(args=args)
+        print("Train accuracy: ", train)
+        print("val accuracy: ", val)
+        print("test accuracy: ", test)
 
     # X is a list of paths of images
-    def predict(self, X, data_root_dir, class_dummy_label='0'):
-        self.copy_to_evaluate(X, class_dummy_label, data_root_dir)
+    def predict(self, X, data_root_dir, classes=['0']): #,'1','2','3','4','5','6','7','8','9']):
+        for label in classes:
+            os.makedirs(os.path.join(data_root_dir,'to_evaluate',label), exist_ok=True)
+        self.copy_to_evaluate(X, classes[0], data_root_dir)
         self.apply_model(data_root_dir)
         return self.read_output(X, data_root_dir)
 
     def copy_to_evaluate(self, X, class_dummy_label, data_root_dir):
-        dataset = np.vstack((np.atleast_2d(X), np.repeat(class_dummy_label, len(X)))).T
+        dataset = np.vstack((np.atleast_2d(X), np.repeat(0, len(X)))).T
         self.data_adapter.create_symlink_dataset(dataset, data_root_dir, subfolder=self.EVALUATE_SUBFOLDER)
 
     def apply_model(self, data_root_dir):
@@ -46,12 +51,12 @@ class DeepDIVAModelAdapter(object):
         best_model = glob(os.path.join(self.dir, '**', 'model_best.pth.tar'), recursive=True)
         args = ["--experiment-name", "evaluation",
                 "--runner-class", "apply_model",
-                "--dataset-folder", data_root_dir,
+                "--dataset-folder", os.path.join(data_root_dir,'to_evaluate'),
                 "--output-folder", data_root_dir,
                 "--load-model", best_model[0],
                 "--ignoregit",
                 "--no-cuda",
-                "--classify"]
+                "--output-channels", '10']
         RunMe().main(args=args)
 
     def read_output(self, X, data_root_dir):
@@ -60,8 +65,12 @@ class DeepDIVAModelAdapter(object):
         with open(output, 'rb') as file:
             data = pickle.load(file)
 
-        df = pd.DataFrame(data=np.array([data[1],data[2],data[3]]).T, columns=['Dummy_Predictions', 'Labels','filenames'])
-        print(df.describe())
+        #df = pd.DataFrame(data=np.array([data[1],data[2],data[3]]).T, columns=['Labels', 'Dummy_Predictions','filenames'])
+        # print(df.head(10))
+        # print(df.describe())
+        print("features: ", (data[0].shape))
+        print("labels", np.unique(np.argmax(data[0], axis=1)))
+        # print("filenames: ", np.unique(data[3]))
         # TODO pase output
 
 
@@ -72,12 +81,12 @@ if __name__ == '__main__':
     # data_adapter.copy_symlink(playground_dir, subfolder='val')
     # data_adapter.copy_symlink(playground_dir, subfolder='test')
     ddma = DeepDIVAModelAdapter(playground_dir, data_adapter)
-    #
-    # # Run fit
+
+    # Run fit
     # ddma.train()
     #
-    # # testwise use val as unknown dataset split
+    # testwise use val as unknown dataset split
     eval_dataset = data_adapter.read_folder_dataset(subfolder='val')
     print(eval_dataset[:, 0])
-    ddma.predict(eval_dataset[:, 0], os.path.join(playground_dir, 'someOtherModelDir'))
+    # ddma.predict(eval_dataset[:, 0], os.path.join(playground_dir, 'someOtherModelDir'))
     ddma.read_output([], os.path.join(playground_dir, 'someOtherModelDir'))
