@@ -15,7 +15,7 @@ class Resource(object):
         self.objects = []
         self.dir = os.path.join(ROOT_DIR, EXPERIMENTS_PATH)
 
-    def get_experiment_directory(self):
+    def path(self):
         return self.dir
 
     def add(self, object_to_add, *argv):

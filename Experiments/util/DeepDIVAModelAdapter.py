@@ -4,12 +4,10 @@ import numpy as np
 import pickle
 import pandas as pd
 import shutil
-
-from Experiments.util.DeepDIVADatasetAdapter import DeepDIVADatasetAdapter
-
-sys.path.append("/deepdiva/")
 import os
 
+from experiments.util.DeepDIVADatasetAdapter import DeepDIVADatasetAdapter
+sys.path.append("/deepdiva/")
 from template.RunMe import RunMe
 
 
@@ -35,10 +33,10 @@ class DeepDIVAModelAdapter(object):
         print("test accuracy: ", test)
 
     # X is a list of paths of images
-    def predict(self, X, data_root_dir, classes=['0']): #,'1','2','3','4','5','6','7','8','9']):
+    def predict(self, X, data_root_dir, classes=['0']):  # ,'1','2','3','4','5','6','7','8','9']):
         for label in classes:
-            os.makedirs(os.path.join(data_root_dir,'to_evaluate',label), exist_ok=True)
-        self.copy_to_evaluate(X, classes[0], data_root_dir)
+            os.makedirs(os.path.join(data_root_dir, 'to_evaluate', label), exist_ok=True)
+        self.copy_to_evaluate(X[:], classes[0], data_root_dir)
         self.apply_model(data_root_dir)
         return self.read_output(X, data_root_dir)
 
@@ -47,12 +45,12 @@ class DeepDIVAModelAdapter(object):
         self.data_adapter.create_symlink_dataset(dataset, data_root_dir, subfolder=self.EVALUATE_SUBFOLDER)
 
     def apply_model(self, data_root_dir):
-        analytics_csv = glob(os.path.join(self.dir,'analytics.csv'))[0]
-        os.symlink(analytics_csv, os.path.join(data_root_dir,'to_evaluate/analytics.csv'))
+        analytics_csv = glob(os.path.join(self.dir, 'analytics.csv'))[0]
+        os.symlink(analytics_csv, os.path.join(data_root_dir, 'to_evaluate/analytics.csv'))
         best_model = glob(os.path.join(self.dir, '**', 'model_best.pth.tar'), recursive=True)
         args = ["--experiment-name", "evaluation",
                 "--runner-class", "apply_model",
-                "--dataset-folder", os.path.join(data_root_dir,'to_evaluate'),
+                "--dataset-folder", os.path.join(data_root_dir, 'to_evaluate'),
                 "--output-folder", data_root_dir,
                 "--load-model", best_model[0],
                 "--ignoregit",
@@ -66,7 +64,7 @@ class DeepDIVAModelAdapter(object):
         with open(output, 'rb') as file:
             data = pickle.load(file)
 
-        #df = pd.DataFrame(data=np.array([data[1],data[2],data[3]]).T, columns=['Labels', 'Dummy_Predictions','filenames'])
+        # df = pd.DataFrame(data=np.array([data[1],data[2],data[3]]).T, columns=['Labels', 'Dummy_Predictions','filenames'])
         # print(df.head(10))
         # print(df.describe())
         print("features: ", (data[0].shape))
@@ -76,7 +74,7 @@ class DeepDIVAModelAdapter(object):
 
 
 if __name__ == '__main__':
-    remove_existing = True
+    remove_existing = False
     remove_someother = True
 
     playground_dir = '/IP5_DataQuality/Playground/'
@@ -92,8 +90,8 @@ if __name__ == '__main__':
 
         # Run fit
         ddma.train()
-    if not os.path.exists(os.path.join(playground_dir,'log')) or remove_someother:
-        shutil.rmtree(os.path.join(playground_dir,'someOtherModelDir'))
+    if remove_someother:
+        shutil.rmtree(os.path.join(playground_dir, 'someOtherModelDir'))
         # testwise use val as unknown dataset split
         eval_dataset = data_adapter.read_folder_dataset(subfolder='val')
         print(eval_dataset[:, 0])
