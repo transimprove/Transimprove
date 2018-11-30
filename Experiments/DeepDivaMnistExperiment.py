@@ -4,6 +4,7 @@ from shutil import rmtree
 import numpy as np
 
 from Experiments.helper.DeepDIVAModelAdapter import DeepDIVAModelAdapter
+from Experiments.helper.plots import plot_score_comparisons
 from Experiments.helper.resource import Resource
 from Experiments.helper.DeepDIVADatasetAdapter import DeepDIVADatasetAdapter
 from Experiments.helper.create_distributed_labels import  generate_new_annotations_confusionmatrix
@@ -72,20 +73,23 @@ class DeepDivaMnistExperiment:
         datapoints_for_pipeline = np.vstack((np.arange(0, len(X_datapoints)),X_datapoints)).T
 
         transimporve_pipeline = Pipeline(datapoints_for_pipeline, annotations, models=[('DeepDivaMNIST', existing_model)])
-        certainties = np.arange(0.60, 0.90, 0.025)
+        consistencies = np.arange(0.60, 0.90, 0.025)
         scores = []
         test = []
-        for certainty in certainties:
-            transimporve_pipeline.fit(certainty)
-            score_certain, _ = self.train_MNIST_DeepDIVA_Model(transimporve_pipeline.certain_data_set(), os.path.join(self.this_resource.get_experiment_directory() ,str(certainty), 'certain_ds'))
-            score_full, _ = self.train_MNIST_DeepDIVA_Model(transimporve_pipeline.full_data_set(), os.path.join(self.this_resource.get_experiment_directory() ,str(certainty), 'full_ds'))
+        for consitency in consistencies:
+            transimporve_pipeline.fit(consitency)
+            score_certain, _ = self.train_MNIST_DeepDIVA_Model(transimporve_pipeline.certain_data_set(), os.path.join(self.this_resource.get_experiment_directory() ,str(consitency), 'certain_ds'))
+            score_full, _ = self.train_MNIST_DeepDIVA_Model(transimporve_pipeline.full_data_set(), os.path.join(self.this_resource.get_experiment_directory() ,str(consitency), 'full_ds'))
             scores.append(score_certain)
             scores.append(score_full)
 
-        scores = np.array(scores).reshape(len(certainties),2)
+        scores = np.array(scores).reshape(len(consistencies),2)
         print(scores)
         self.this_resource.add(scores)
         self.this_resource.save()
+        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores, ['Certain split', 'Full split'], possible_score, existing_score)
+        plot_score_comparisons(self.this_resource.get_experiment_directory(), scores, ['Certain split', 'Full split'], possible_score, existing_score, crop_y=True)
+
 
 
 

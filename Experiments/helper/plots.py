@@ -2,10 +2,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
 
-def plot_score_comparisons(consistencies, scores, columns, max_possible_score, existing_score, crop_y=False):
+def plot_score_comparisons(experiment_path,consistencies, scores, columns, max_possible_score, existing_score, crop_y=False):
     scores = np.array(scores).reshape(len(consistencies), len(columns))
-    data = pd.DataFrame(data=scores, index=consistencies, columns=columns)
-
+    data = pd.DataFrame(data=scores, index=consistencies*100, columns=columns)
     max_possible_scores = np.repeat(max_possible_score*100,len(consistencies))
     existing_scores = np.repeat(existing_score*100,len(consistencies))
     data['Max possible'] = max_possible_scores
@@ -16,10 +15,10 @@ def plot_score_comparisons(consistencies, scores, columns, max_possible_score, e
         ax.set_ylim((min(data[columns[1]]), 100))
         title = title + " cropped"
     data.plot(ax=ax)
-    ax.set(xlabel='Consistency', ylabel='Accuracy')
+    ax.set(xlabel='Consistency (%)', ylabel='Accuracy (%)')
     ax.set_title(title, fontsize=14, fontweight='bold')
-    plt.show()
-    # fig.savefig('score_comparison.png', transparent=False, dpi=80, inches='tight')
+    # plt.show()
+    fig.savefig(os.path.join(experiment_path, title), transparent=False, dpi=80, inches='tight', format='png')
 
 
 
@@ -38,5 +37,5 @@ if __name__ == '__main__':
                  , [95.45, 97.49]
                  , [89.78, 97.47]
                  , [73.79, 97.43]])
-    plot_score_comparisons(np.arange(0.60, 0.90, 0.025), scores, ['Certain split', 'Full split'], 0.98, 0.99)
-    plot_score_comparisons(np.arange(0.60, 0.90, 0.025), scores, ['Certain split', 'Full split'], 0.98, 0.99, True)
+    plot_score_comparisons(np.arange(0.60, 0.90, 0.025), scores, ['Certain split', 'Full split'], 98, 99)
+    plot_score_comparisons(np.arange(0.60, 0.90, 0.025), scores, ['Certain split', 'Full split'], 98, 99, True)
