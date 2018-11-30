@@ -42,12 +42,13 @@ class DeepDIVAModelAdapter(object):
 
     # X is a list of paths of images
     def predict(self, X):
-        data_root_dir = os.path.join('/tmp',str(uuid.uuid1()))
+        data_root_dir = os.path.join('/tmp/DeepDIVAModelAdapter',str(uuid.uuid1()))
         self.classes = sorted(os.listdir(os.path.join(self.dir, self.TRAIN_SUBFOLDER)))
         files_list = X[:, 0]
         self.copy_to_evaluate(files_list, data_root_dir)
         self.apply_model(data_root_dir)
         classification_results = self.read_output(data_root_dir)
+        shutil.rmtree(data_root_dir)
         return self.map_dataset(files_list, classification_results)
 
     def copy_to_evaluate(self, X, data_root_dir):

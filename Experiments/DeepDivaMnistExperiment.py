@@ -1,4 +1,5 @@
 import os
+from shutil import rmtree
 
 import numpy as np
 
@@ -96,6 +97,14 @@ class DeepDivaMnistExperiment:
         self.adaptor.create_symlink_dataset(X_y_val, directory, subfolder='val')
         self.adaptor.copy_symlink(directory, subfolder='test')
         train, val, test = deep_diva_mnist_model.train()
+        rmtree(os.path.join(directory, 'val'))
+        rmtree(os.path.join(directory, 'test'))
+        for classdir in deep_diva_mnist_model.classes:
+            class_dir_full_path = os.path.join(directory,'train',classdir)
+            for file_name in os.listdir(class_dir_full_path):
+                file_path = os.path.join(class_dir_full_path, file_name)
+                if os.path.islink(file_path):
+                    os.unlink(file_path)
         return (test, deep_diva_mnist_model)
 
 
