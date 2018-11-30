@@ -2,6 +2,9 @@ import os
 from shutil import rmtree
 
 import numpy as np
+# from dotenv import load_dotenv
+# from sacred import Experiment
+# from sacred.observers import MongoObserver
 
 from Experiments.helper.DeepDIVAModelAdapter import DeepDIVAModelAdapter
 from Experiments.helper.plots import plot_score_comparisons
@@ -12,6 +15,14 @@ from Experiments.helper.create_distributed_labels import  generate_new_annotatio
 from sklearn.model_selection import train_test_split
 import config
 from Transimprove.Pipeline import Pipeline
+
+#
+# ex = Experiment('DeepDIVAExperiment')
+# load_dotenv()
+# mongodb_port = os.getenv("MONGO_DB_PORT")
+# uri = "mongodb://sample:password@localhost:" + str(mongodb_port) + "/db?authSource=admin"
+# ex.observers.append(MongoObserver.create(url=uri, db_name='db'))
+
 
 
 class DeepDivaMnistExperiment:
@@ -35,21 +46,29 @@ class DeepDivaMnistExperiment:
         self.dir_existing_model = os.path.join(self.this_resource.get_experiment_directory(), "existing_model")
         self.dir_ground_truth_model = os.path.join(self.this_resource.get_experiment_directory(), "ground_truth_model")
 
+    # @ex.config
+    # def config(self):
+    #     annotations_per_label = 4
+    #     dataset_part_for_exising_model = 0.5
+    #
+    # @ex.main
     def main(self):
 
         # run in /deepdiva/helper/data before using
         # python get_a_dataset.py --dataset mnist --output-folder /dd_resources/data/
+        annotations_per_label = 3
+        dataset_part_for_exising_model = 0.5
 
         X_y = self.adaptor.read_folder_dataset(subfolder='original_train')
         X_y_test = self.adaptor.read_folder_dataset(subfolder='test')
-        X_y_existing_model, X_y_remaining = train_test_split(X_y, test_size=0.70, random_state=42)
+        X_y_existing_model, X_y_remaining = train_test_split(X_y, train_size=dataset_part_for_exising_model, random_state=42)
 
 
         X_datapoints = X_y_remaining[:, 0]
         y_labels = X_y_remaining[:, 1]
         allLabels = "0 1 2 3 4 5 6 7 8 9".split(" ")
 
-        annotations = generate_new_annotations_confusionmatrix(self.cm, allLabels, y_labels, count=len(y_labels)*3, normalize=False)
+        annotations = generate_new_annotations_confusionmatrix(self.cm, allLabels, y_labels, count=len(y_labels)*annotations_per_label, normalize=False)
         print('Shape of Annnotations', annotations.shape)
         for label in allLabels:
             print(label, " count: ", np.sum(annotations[:, 1] == label))
@@ -73,9 +92,8 @@ class DeepDivaMnistExperiment:
         datapoints_for_pipeline = np.vstack((np.arange(0, len(X_datapoints)),X_datapoints)).T
 
         transimporve_pipeline = Pipeline(datapoints_for_pipeline, annotations, models=[('DeepDivaMNIST', existing_model)])
-        consistencies = np.arange(0.60, 0.90, 0.025)
+        consistencies = np.arange(0.55, 0.96, 0.01)
         scores = []
-        test = []
         for consitency in consistencies:
             transimporve_pipeline.fit(consitency)
             score_certain, _ = self.train_MNIST_DeepDIVA_Model(transimporve_pipeline.certain_data_set(), os.path.join(self.this_resource.get_experiment_directory() ,str(consitency), 'certain_ds'))
@@ -88,7 +106,7 @@ class DeepDivaMnistExperiment:
         self.this_resource.add(scores)
         self.this_resource.save()
         plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores, ['Certain split', 'Full split'], possible_score, existing_score)
-        plot_score_comparisons(self.this_resource.get_experiment_directory(), scores, ['Certain split', 'Full split'], possible_score, existing_score, crop_y=True)
+        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores, ['Certain split', 'Full split'], possible_score, existing_score, crop_y=True)
 
 
 
