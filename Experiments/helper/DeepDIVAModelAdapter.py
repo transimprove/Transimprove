@@ -36,8 +36,7 @@ class DeepDIVAModelAdapter(object):
                 "--output-folder", os.path.join(self.dir, self.MODEL_LOG),
                 "--dataset-folder", self.dir,
                 "--lr", "0.1",
-                "--ignoregit",
-                "--no-cuda"]
+                "--ignoregit"]# ,"--no-cuda"]
         return RunMe().main(args=args)
 
     # X is a list of paths of images
@@ -65,7 +64,7 @@ class DeepDIVAModelAdapter(object):
                 "--output-folder", os.path.join(data_root_dir, self.EVALUATION_LOG),
                 "--load-model", best_model[0],
                 "--ignoregit",
-                "--no-cuda",
+                #"--no-cuda",
                 "--output-channels", len(self.classes).__str__()]
         RunMe().main(args=args)
 

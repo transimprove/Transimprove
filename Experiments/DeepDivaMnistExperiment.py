@@ -72,7 +72,7 @@ class DeepDivaMnistExperiment:
         datapoints_for_pipeline = np.vstack((np.arange(0, len(X_datapoints)),X_datapoints)).T
 
         transimporve_pipeline = Pipeline(datapoints_for_pipeline, annotations, models=[('DeepDivaMNIST', existing_model)])
-        certainties = np.arange(0.60, 0.90, 0.1)
+        certainties = np.arange(0.60, 0.90, 0.025)
         scores = []
         test = []
         for certainty in certainties:
