@@ -56,8 +56,8 @@ class DeepDivaMnistExperiment:
 
         # run in /deepdiva/helper/data before using
         # python get_a_dataset.py --dataset mnist --output-folder /dd_resources/data/
-        annotations_per_label = 3
-        dataset_part_for_exising_model = 0.5
+        annotations_per_label = 5
+        dataset_part_for_exising_model = 0.6
 
         X_y = self.adaptor.read_folder_dataset(subfolder='original_train')
         X_y_test = self.adaptor.read_folder_dataset(subfolder='test')
@@ -92,7 +92,7 @@ class DeepDivaMnistExperiment:
         datapoints_for_pipeline = np.vstack((np.arange(0, len(X_datapoints)),X_datapoints)).T
 
         transimporve_pipeline = Pipeline(datapoints_for_pipeline, annotations, models=[('DeepDivaMNIST', existing_model)])
-        consistencies = np.arange(0.55, 0.96, 0.01)
+        consistencies = np.arange(0.51, 0.98, 0.01)
         scores = []
         for consitency in consistencies:
             transimporve_pipeline.fit(consitency)
@@ -115,19 +115,22 @@ class DeepDivaMnistExperiment:
     def train_MNIST_DeepDIVA_Model(self, X_y_data, directory):
         deep_diva_mnist_model = DeepDIVAModelAdapter(directory, self.adaptor)
         X_y_train, X_y_val = train_test_split(X_y_data, test_size=0.2, random_state=42)
-        self.adaptor.create_symlink_dataset(X_y_train, directory, subfolder='train')
-        self.adaptor.create_symlink_dataset(X_y_val, directory, subfolder='val')
-        self.adaptor.copy_symlink(directory, subfolder='test')
-        train, val, test = deep_diva_mnist_model.train()
-        rmtree(os.path.join(directory, 'val'))
-        rmtree(os.path.join(directory, 'test'))
-        for classdir in deep_diva_mnist_model.classes:
-            class_dir_full_path = os.path.join(directory,'train',classdir)
-            for file_name in os.listdir(class_dir_full_path):
-                file_path = os.path.join(class_dir_full_path, file_name)
-                if os.path.islink(file_path):
-                    os.unlink(file_path)
-        return (test, deep_diva_mnist_model)
+        if np.unique(X_y_train[:,1]).size == 10 and np.unique(X_y_val[:,1]).size == 10:
+            self.adaptor.create_symlink_dataset(X_y_train, directory, subfolder='train')
+            self.adaptor.create_symlink_dataset(X_y_val, directory, subfolder='val')
+            self.adaptor.copy_symlink(directory, subfolder='test')
+            train, val, test = deep_diva_mnist_model.train()
+            rmtree(os.path.join(directory, 'val'))
+            rmtree(os.path.join(directory, 'test'))
+            for classdir in deep_diva_mnist_model.classes:
+                class_dir_full_path = os.path.join(directory,'train',classdir)
+                for file_name in os.listdir(class_dir_full_path):
+                    file_path = os.path.join(class_dir_full_path, file_name)
+                    if os.path.islink(file_path):
+                        os.unlink(file_path)
+            return (test, deep_diva_mnist_model)
+        else:
+            return (np.nan, None)
 
 
 
