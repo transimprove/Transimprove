@@ -14,7 +14,7 @@ def plot_score_comparisons(experiment_path,consistencies, scores, columns, max_p
     fig, ax = plt.subplots()
     title = "Accuracy comparison"
     if  crop_y:
-        ax.set_ylim((min(data[columns[1]]), 100))
+        ax.set_ylim((min(data[columns[1]])-1, max(data[columns[1]])+0.5))
         title = title + " cropped"
     data.plot(ax=ax)
     ax.set(xlabel='Consistency (%)', ylabel='Accuracy (%)')
