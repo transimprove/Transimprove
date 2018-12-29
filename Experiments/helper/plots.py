@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
@@ -5,20 +7,20 @@ import pandas as pd
 def plot_score_comparisons(experiment_path,consistencies, scores, columns, max_possible_score, existing_score, crop_y=False):
     scores = np.array(scores).reshape(len(consistencies), len(columns))
     data = pd.DataFrame(data=scores, index=consistencies*100, columns=columns)
-    max_possible_scores = np.repeat(max_possible_score*100,len(consistencies))
-    existing_scores = np.repeat(existing_score*100,len(consistencies))
+    max_possible_scores = np.repeat(max_possible_score,len(consistencies))
+    existing_scores = np.repeat(existing_score,len(consistencies))
     data['Max possible'] = max_possible_scores
     data['Applied model'] = existing_scores
     fig, ax = plt.subplots()
     title = "Accuracy comparison"
     if  crop_y:
-        ax.set_ylim((min(data[columns[1]]), 100))
+        ax.set_ylim((min(data[columns[1]])-1, max(data[columns[1]])+0.5))
         title = title + " cropped"
     data.plot(ax=ax)
     ax.set(xlabel='Consistency (%)', ylabel='Accuracy (%)')
     ax.set_title(title, fontsize=14, fontweight='bold')
     # plt.show()
-    fig.savefig(os.path.join(experiment_path, title), transparent=False, dpi=80, inches='tight', format='png')
+    fig.savefig(os.path.join(experiment_path,title+".png"), transparent=False, dpi=80, inches='tight', format='png')
 
 
 

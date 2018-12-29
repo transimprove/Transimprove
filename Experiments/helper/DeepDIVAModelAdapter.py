@@ -25,6 +25,7 @@ class DeepDIVAModelAdapter(object):
     EVALUATION_OUTPUT_FILE = 'results.pkl'
     ANALYTICS_FILE = 'analytics.csv'
     MODEL_NAME = 'model_best.pth.tar'
+    EPOCHS = 35
 
     def __init__(self, dir, data_adapter: DeepDIVADatasetAdapter):
         self.dir = dir
@@ -36,6 +37,7 @@ class DeepDIVAModelAdapter(object):
                 "--output-folder", os.path.join(self.dir, self.MODEL_LOG),
                 "--dataset-folder", self.dir,
                 "--lr", "0.1",
+                "--epochs", str(self.EPOCHS),
                 "--ignoregit"]# ,"--no-cuda"]
         return RunMe().main(args=args)
 
@@ -64,6 +66,7 @@ class DeepDIVAModelAdapter(object):
                 "--output-folder", os.path.join(data_root_dir, self.EVALUATION_LOG),
                 "--load-model", best_model[0],
                 "--ignoregit",
+                "--epochs", str(self.EPOCHS),
                 #"--no-cuda",
                 "--output-channels", len(self.classes).__str__()]
         RunMe().main(args=args)
