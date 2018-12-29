@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 from matplotlib.collections import QuadMesh
 import seaborn as sn
+import pandas as pd
 
 
 def get_new_fig(fn, figsize=[9, 9]):
@@ -244,3 +245,24 @@ def plot_confusion_matrix_from_data(y_test, predictions, columns=None, annot=Tru
     df_cm = DataFrame(confm, index=columns, columns=columns)
     return pretty_plot_confusion_matrix(df_cm, fz=fz, cmap=cmap, figsize=figsize, show_null_values=show_null_values,
                                         pred_val_axis=pred_val_axis)
+
+
+if __name__ == '__main__':
+
+    cm = np.array([
+            # ['0', 1,   2,   3,   4    5    6    7    8    9]
+            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # 0
+            [0, 0.7, 0, 0, 0, 0, 0, 0.3, 0, 0],  # 1
+            [0, 0, 1, 0, 0, 0, 0, 0, 0, 0],  # 2
+            [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],  # 3
+            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0],  # 4
+            [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],  # 5
+            [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],  # 6
+            [0, 0.3, 0, 0, 0, 0, 0, 0.7, 0, 0],  # 7
+            [0, 0, 0, 0, 0, 0, 0, 0, 0.7, 0.3],  # 8
+            [0, 0, 0, 0, 0, 0, 0, 0, 0.3, 0.7]  # 9
+        ])
+
+    cm_pd = pd.DataFrame(data=cm)
+    fig = pretty_plot_confusion_matrix(cm_pd)
+    fig.savefig("cm")
