@@ -56,7 +56,7 @@ class DeepDivaMnistExperiment:
 
         # run in /deepdiva/helper/data before using
         # python get_a_dataset.py --dataset mnist --output-folder /dd_resources/data/
-        annotations_per_label = 15
+        annotations_per_label = 6
         dataset_part_for_exising_model = 0.7
 
         X_y = self.adaptor.read_folder_dataset(subfolder='original_train')
