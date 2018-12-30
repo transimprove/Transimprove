@@ -32,15 +32,15 @@ class DeepDivaMnistExperiment:
         self.cm = np.array([
           # [0,  1,   2,   3,   4    5    6    7    8    9] given Laben/ true label
             [1,   0,   0,   0,   0,   0,   0,   0,   0,   0],      # 0
-            [0, 0.7,   0,   0,   0,   0,   0, 0.3,   0,   0],      # 1
+            [0, 0.5,   0,   0,   0,   0,   0, 0.5,   0,   0],      # 1
             [0,   0,   1,   0,   0,   0,   0,   0,   0,   0],      # 2
             [0,   0,   0,   1,   0,   0,   0,   0,   0,   0],      # 3
             [0,   0,   0,   0,   1,   0,   0,   0,   0,   0],      # 4
             [0,   0,   0,   0,   0,   1,   0,   0,   0,   0],      # 5
             [0,   0,   0,   0,   0,   0,   1,   0,   0,   0],      # 6
-            [0, 0.3,   0,   0,   0,   0,   0, 0.7,   0,   0],      # 7
-            [0,   0,   0,   0,   0,   0,   0,   0, 0.7, 0.3],      # 8
-            [0,   0,   0,   0,   0,   0,   0,   0, 0.3, 0.7]       # 9
+            [0, 0.5,   0,   0,   0,   0,   0, 0.5,   0,   0],      # 7
+            [0,   0,   0,   0,   0,   0,   0,   0, 0.5, 0.5],      # 8
+            [0,   0,   0,   0,   0,   0,   0,   0, 0.5, 0.5]       # 9
         ])
         self.adaptor = DeepDIVADatasetAdapter(config.MNIST_PATH_ORIGINAL)
         self.dir_existing_model = os.path.join(self.this_resource.get_experiment_directory(), "existing_model")
