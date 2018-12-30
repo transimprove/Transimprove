@@ -9,8 +9,8 @@ def plot_score_comparisons(experiment_path,consistencies, scores, columns, max_p
     data = pd.DataFrame(data=scores, index=consistencies*100, columns=columns)
     max_possible_scores = np.repeat(max_possible_score,len(consistencies))
     existing_scores = np.repeat(existing_score,len(consistencies))
-    data['Max possible'] = max_possible_scores
-    data['Applied model'] = existing_scores
+    data['Ground truth-model'] = max_possible_scores
+    data['Plug-in-model'] = existing_scores
     fig, ax = plt.subplots()
     title = "Accuracy comparison"
     if  crop_y:
@@ -20,7 +20,7 @@ def plot_score_comparisons(experiment_path,consistencies, scores, columns, max_p
     ax.set(xlabel='Consistency (%)', ylabel='Accuracy (%)')
     ax.set_title(title, fontsize=14, fontweight='bold')
     # plt.show()
-    fig.savefig(os.path.join(experiment_path,title+".png"), transparent=False, dpi=80, inches='tight', format='png')
+    fig.savefig(os.path.join(experiment_path,title+".png"), transparent=False, dpi=200, inches='tight', format='png')
 
 
 

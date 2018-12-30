@@ -105,8 +105,8 @@ class DeepDivaMnistExperiment:
         print(scores)
         self.this_resource.add(scores)
         self.this_resource.save()
-        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores, ['Certain split', 'Full split'], possible_score, existing_score)
-        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores, ['Certain split', 'Full split'], possible_score, existing_score, crop_y=True)
+        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores, ['Certain dataset-model', 'Full dataset-model'], possible_score, existing_score)
+        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores, ['Certain dataset-model', 'Full dataset-model'], possible_score, existing_score, crop_y=True)
 
 
 
