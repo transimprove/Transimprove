@@ -92,7 +92,7 @@ class DeepDivaMnistExperiment:
         datapoints_for_pipeline = np.vstack((np.arange(0, len(X_datapoints)),X_datapoints)).T
 
         transimporve_pipeline = Pipeline(datapoints_for_pipeline, annotations, models=[('DeepDivaMNIST', existing_model)])
-        consistencies = np.arange(0.50, 0.85, 0.01)
+        consistencies = np.arange(0.50, 0.98, 0.01)
         scores = []
         for consitency in consistencies:
             transimporve_pipeline.fit(consitency)
