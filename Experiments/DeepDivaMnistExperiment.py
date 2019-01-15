@@ -92,7 +92,7 @@ class DeepDivaMnistExperiment:
         datapoints_for_pipeline = np.vstack((np.arange(0, len(X_datapoints)),X_datapoints)).T
 
         transimporve_pipeline = Pipeline(datapoints_for_pipeline, annotations, models=[('DeepDivaMNIST', existing_model)])
-        consistencies = np.arange(0.51, 0.98, 0.01)
+        consistencies = np.arange(0.50, 0.98, 0.01)
         scores = []
         for consitency in consistencies:
             transimporve_pipeline.fit(consitency)
@@ -105,8 +105,8 @@ class DeepDivaMnistExperiment:
         print(scores)
         self.this_resource.add(scores)
         self.this_resource.save()
-        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores, ['Certain split', 'Full split'], possible_score, existing_score)
-        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores, ['Certain split', 'Full split'], possible_score, existing_score, crop_y=True)
+        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores, ['Certain dataset-model', 'Full dataset-model'], possible_score, existing_score)
+        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores, ['Certain dataset-model', 'Full dataset-model'], possible_score, existing_score, crop_y=True)
 
 
 
