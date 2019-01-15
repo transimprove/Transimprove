@@ -6,12 +6,6 @@ conda env create -f environment.yml
 ```
 To use this environment in pycharm select the created conda environment under ```project interpreter```.
 
-If a new dependency is added just overwrite the environment file:
-```bash
-source activate ENV_NAME # or use direnv see https://github.com/direnv/direnv
-conda env export > environment.yaml
-
-```
 
 ## How to start an experiment in detached mode
 
