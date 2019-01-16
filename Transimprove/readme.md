@@ -24,7 +24,7 @@ annotations = np.array(
          ['c', 'Class4']])
 ```
 
-Modeladaptor: Can be used for any sklearn flavored prediction algorithm. The `translation_dictionary` will map output of the `model` to one class we would like. If the output of the `model` can not be mapped with `translation_dictionary` the result will be `NaN` ant therefore ignored within the Pipeline.
+Modeladaptor: Can be used for any sklearn flavored prediction algorithm. The `translation_dictionary` will map output of the `model` to one class we would like. If the output of the `model` can not be mapped with `translation_dictionary` the result will be `NaN` and therefore ignored within the Pipeline.
 ```python
 myAdaptor1 = AbstractModeladaptor(
     model=somePredictor(),

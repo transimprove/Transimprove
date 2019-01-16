@@ -1,8 +1,17 @@
+# Author: Philipp Lüthi <philipp.luethi@students.fhnw.ch>
+# License: MIT
+
 import pandas as pd
 import numpy as np
 
 
 def transform_majority_label(rated_annotations: pd.DataFrame) -> pd.Series:
+    """
+    Reduce a Pandas.DataFrame showing consistency per class per data point to a
+    data point - label association.
+    :param rated_annotations:
+    :return: ndarray.
+    """
     return rated_annotations.idxmax(axis=1)
 
 
@@ -38,6 +47,13 @@ class Pipeline:
         self.uncertain_split = rated_annotations[certain_labels == False]
 
     def fit(self, threshold: float):
+        """
+        Triggers the analysis of the provided annotations. Will split the data in uncertain and certain datapoints.
+        Prediction with the provided models will be executed & results collected in self.model_predictions. This
+        action validates the pipeline state. certain_data_set(), uncertain_data_set() and full_data_set() are now
+        callable.
+        :param threshold: float Consistency threshold.
+        """
         self.__calculate_certain_uncertain_split(threshold)
         ids_uncertain = self.uncertain_split.index.values
         self.model_predictions = None
@@ -51,6 +67,13 @@ class Pipeline:
         self.__invalidated = False
 
     def certain_data_set(self, return_X_y=False, threshold: float = None):
+        """
+        Return data points that did reach consistency threshold in annotations with their label
+        given by the majority vote.
+        :param return_X_y: boolean, default=False: If True, returns ``(data, target)`` instead of a Bunch object.
+        :param threshold: float, default=None: definition will trigger refitting of Pipeline.
+        :return: ndarray: Dataset with associated labels viable for training.
+        """
         if self.__invalidated and threshold is None:
             raise ValueError("Model state invalid. Invoke fit() or provide threshold")
         elif self.__invalidated:
@@ -66,6 +89,13 @@ class Pipeline:
             return np.hstack((data.values, np.atleast_2d(id_label[:,1]).T))
 
     def uncertain_data_set(self, return_X_y=False, threshold: float = None):
+        """
+        Return data points that did not reach consistency threshold in annotations with their label given by the
+        provided models (majority vote)
+        :param return_X_y: boolean, default=False: If True, returns ``(data, target)`` instead of a Bunch object.
+        :param threshold: float, default=None: definition will trigger refitting of Pipeline.
+        :return: ndarray: Dataset with associated labels viable for training.
+        """
         if self.__invalidated and threshold is None:
             raise ValueError("Model state invalid. Invoke fit() or provide threshold")
         elif self.__invalidated:
@@ -84,6 +114,12 @@ class Pipeline:
             return np.hstack((data.values, np.atleast_2d(id_label[:,1]).T))
 
     def full_data_set(self, return_X_y=False, threshold: float=None):
+        """
+        Combine results from certain_data_set() and uncertain_data_set().
+        :param return_X_y: boolean, default=False: If True, returns ``(data, target)`` instead of a Bunch object.
+        :param threshold: float, default=None: definition will trigger refitting of Pipeline.
+        :return: ndarray: Dataset with associated labels viable for training.
+        """
         if return_X_y:
             X_certain, y_certain = self.certain_data_set(return_X_y=True, threshold=threshold)
             X_uncertain, y_uncertain = self.uncertain_data_set(return_X_y=True, threshold=threshold)
