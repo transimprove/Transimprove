@@ -9,28 +9,20 @@ class AbstractModeladaptor(object):
 
     def __init__(self, model=None, translation_dictionary=None):
         """
-        Parameters
-        ----------
-        model : object
-            any sklearn flavored model working with np.array as input
-        translation_dictionary : dict
-            translation dictionary from model prediction to AbstractModeladaptor output.
+
+        :param model: object Any sklearn flavored model working with np.array as input
+        :param translation_dictionary: dict translation dictionary from model prediction to AbstractModeladaptor output.
             Unknown model output results in NaN.
+
         """
         self.model = model
         self.dict = translation_dictionary
 
     def predict(self, X):
         """
-        Parameters
-        ----------
-        X : ndarray
-            Input data for model. Might be preprocessed in self.preprocess()
-        Returns
-        ndarray
-            Transformed labels predicted by model using translation_dictionary.
+        :param X: ndarray Input data for model. Might be preprocessed in self.preprocess()
+        :return: ndarray  Transformed labels predicted by model using translation_dictionary.
             Missing translation_dictionary entry leads to Nan.
-        -------
         """
         x = self.preprocess(X)
         y = self.model_predict(x)
