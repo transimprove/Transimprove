@@ -15,8 +15,13 @@ import sys
 sys.path.append("/deepdiva/")
 from template.RunMe import RunMe
 
-
 class DeepDIVAModelAdapter(object):
+    """
+    DeepDIVA installation is precondition for this class to work.
+    This class invokes DeepDIVA RunMe command with the parameters defined below.
+    With the help of DeepDIVADatasetAdapter it creates a directory & file based training
+    environment that natively works with DeepDIVA CNN implementation.
+    """
     EVALUATE_SUBFOLDER = 'to_evaluate'
     TRAIN_SUBFOLDER = 'train'
     DUMMY_LABEL = 'dummy'
@@ -28,10 +33,19 @@ class DeepDIVAModelAdapter(object):
     EPOCHS = 35
 
     def __init__(self, dir, data_adapter: DeepDIVADatasetAdapter):
+        """
+        Initialize the adaptor on a working directory
+        :param dir: string: Working directory
+        :param data_adapter: DeepDIVADatasetAdapter
+        """
         self.dir = dir
         self.data_adapter = data_adapter
 
     def train(self):
+        """
+        Start training of working directory with DeepDIVA.
+        :return:
+        """
         self.classes = sorted(os.listdir(os.path.join(self.dir, self.TRAIN_SUBFOLDER)))
         args = ["--experiment-name", "DeepDivaModelAdapter_train",
                 "--output-folder", os.path.join(self.dir, self.MODEL_LOG),
@@ -43,6 +57,11 @@ class DeepDIVAModelAdapter(object):
 
     # X is a list of paths of images
     def predict(self, X):
+        """
+        predict classes from files given by X.
+        :param X: 2D ndarray, Filenames
+        :return: 2D ndarray, predicted classes
+        """
         data_root_dir = os.path.join('/tmp/DeepDIVAModelAdapter',str(uuid.uuid1()))
         self.classes = sorted(os.listdir(os.path.join(self.dir, self.TRAIN_SUBFOLDER)))
         files_list = X[:, 0]
@@ -53,6 +72,11 @@ class DeepDIVAModelAdapter(object):
         return self.map_dataset(files_list, classification_results)
 
     def copy_to_evaluate(self, X, data_root_dir):
+        """
+        Prepare directory with files for prediction
+        :param X: 2D ndarray, Filenames
+        :param data_root_dir: evaluation directory
+        """
         dataset = np.vstack((np.atleast_2d(X), np.repeat(self.DUMMY_LABEL, len(X)))).T
         self.data_adapter.create_symlink_dataset(dataset, data_root_dir, subfolder=self.EVALUATE_SUBFOLDER)
 
@@ -72,6 +96,11 @@ class DeepDIVAModelAdapter(object):
         RunMe().main(args=args)
 
     def read_output(self, data_root_dir):
+        """
+        Interpret DeepDIVA output file.
+        :param data_root_dir:
+        :return:
+        """
         output = glob(os.path.join(data_root_dir,self.EVALUATION_LOG, '**', self.EVALUATION_OUTPUT_FILE), recursive=True)[0]
         with open(output, 'rb') as file:
             data = pickle.load(file)
