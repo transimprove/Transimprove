@@ -5,6 +5,16 @@ from matplotlib import pyplot as plt
 import pandas as pd
 
 def plot_score_comparisons(experiment_path,consistencies, scores, columns, max_possible_score, existing_score, crop_y=False):
+    """
+    :param experiment_path:
+    :param consistencies:
+    :param scores:
+    :param columns:
+    :param max_possible_score:
+    :param existing_score:
+    :param crop_y:
+    :return:
+    """
     scores = np.array(scores).reshape(len(consistencies), len(columns))
     data = pd.DataFrame(data=scores, index=consistencies*100, columns=columns)
     max_possible_scores = np.repeat(max_possible_score,len(consistencies))

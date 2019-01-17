@@ -7,6 +7,8 @@ import pandas as pd
 File does provide functions to analyse and transform annotations on majority vote.
 Functions can be encapsulated.
 """
+
+
 def rate_annotations_by_datapoint(annotations: np.ndarray) -> pd.DataFrame:
     """
     Generate a Pandas.DataFrame which shows the consistency for each class on each data point

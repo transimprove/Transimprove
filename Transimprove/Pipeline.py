@@ -84,9 +84,9 @@ class Pipeline:
             return (None, None) if return_X_y else None
         data = self.__datapoints.loc[id_label[:, 0]]
         if return_X_y:
-            return (data.values, np.atleast_2d(id_label[:,1]).T)
+            return (data.values, np.atleast_2d(id_label[:, 1]).T)
         else:
-            return np.hstack((data.values, np.atleast_2d(id_label[:,1]).T))
+            return np.hstack((data.values, np.atleast_2d(id_label[:, 1]).T))
 
     def uncertain_data_set(self, return_X_y=False, threshold: float = None):
         """
@@ -109,11 +109,11 @@ class Pipeline:
 
         data = self.__datapoints.loc[id_label[:, 0]]
         if return_X_y:
-            return (data.values, np.atleast_2d(id_label[:,1]).T)
+            return (data.values, np.atleast_2d(id_label[:, 1]).T)
         else:
-            return np.hstack((data.values, np.atleast_2d(id_label[:,1]).T))
+            return np.hstack((data.values, np.atleast_2d(id_label[:, 1]).T))
 
-    def full_data_set(self, return_X_y=False, threshold: float=None):
+    def full_data_set(self, return_X_y=False, threshold: float = None):
         """
         Combine results from certain_data_set() and uncertain_data_set().
         :param return_X_y: boolean, default=False: If True, returns ``(data, target)`` instead of a Bunch object.

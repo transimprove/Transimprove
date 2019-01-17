@@ -53,4 +53,4 @@ class AbstractModeladaptor(object):
         return self.model.predict(x)
 
     def label_transform(self, y):
-        return np.vectorize(lambda model_output: self.dict.get(model_output,None))(y)
+        return np.vectorize(lambda model_output: self.dict.get(model_output, None))(y)
