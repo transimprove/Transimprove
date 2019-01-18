@@ -16,7 +16,10 @@ from Transimprove.Pipeline import Pipeline
 
 class DeepDivaMnistExperiment(object):
     """
-
+    The class runs our experiments using DeepDIVA. It uses the same logic as designed in the proof_of_concept.py and
+    the SklearnExperiments.py but uses the full MNIST dataset comapared to the SKLearnExperiments.py.
+    For execution instructions, see README.md. For pipeline application see the Transimprove readme in the
+    Transimprove folder.
     """
 
     def __init__(self):
@@ -76,6 +79,8 @@ class DeepDivaMnistExperiment(object):
         transimprove_pipeline = Pipeline(datapoints_for_pipeline, annotations,
                                          models=[('DeepDivaMNIST', existing_model)])
         consistencies = np.arange(0.50, 0.98, 0.01)
+
+        # runs multiple experiments for each consistency threshold in the defined range above
         scores = []
         for consistency in consistencies:
             transimprove_pipeline.fit(consistency)

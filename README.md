@@ -30,7 +30,7 @@ To use this environment in pycharm select the created conda environment under ``
 ## SklearnExperimentDigits.py
 
 This implementation uses sacred to save the parameters in a database and these parameters
-can be viewed with omniboard in a GUI.
+can be viewed with omniboard in a GUI. See the docs at https://sacred.readthedocs.io for more info about sacred.
 Before starting this experiment, make sure to start the omniboard/mongodb docker containers using:
 ```bash
 ➜ docker-compose up -d

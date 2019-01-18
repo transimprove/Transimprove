@@ -16,6 +16,14 @@ from Experiments.helper.create_distributed_labels import generate_new_annotation
 from yellowbrick.classifier import ClassificationReport
 from yellowbrick.classifier import ConfusionMatrix
 
+"""
+    The class runs our experiments using Scikit-learn. It uses the same logic as designed in the proof_of_concept.py and
+    saves all parameters using sacred.
+    Make sure that the docker containers are running. See the README.md for execution instructions and the sacred
+    documentation at https://sacred.readthedocs.io.
+    For pipeline application see the Transimprove readme in the Transimprove folder.
+    """
+
 ex = Experiment('SklearnProofOfConcept')
 load_dotenv()
 mongodb_port = os.getenv("MONGO_DB_PORT")
