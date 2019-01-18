@@ -45,28 +45,23 @@ def main():
     ex.observers.append(MongoObserver.create(url='localhost:27017',
                                              db_name='sacred'))
 
-    @ex.config
-    def cfg():
-        datapoints = np.array(df_data.reset_index().values)
-        annotation = np.array(df_annotations.values)
-        myAdaptor1 = AbstractModeladaptor(model=DumpModel('DumbLabel'), translation_dictionary={'DumbLabel': 'L1'})
-        myAdaptor2 = AbstractModeladaptor(model=DumpModel('DumbLabel'), translation_dictionary={'DumbLabel': 'L1'})
-        myAdaptor3 = AbstractModeladaptor(model=DumpModel('DumbLabel'), translation_dictionary={'DumbLabel': 'L2'})
+    datapoints = np.array(df_data.reset_index().values)
+    annotation = np.array(df_annotations.values)
+    myAdaptor1 = AbstractModeladaptor(model=DumpModel('DumbLabel'), translation_dictionary={'DumbLabel': 'L1'})
+    myAdaptor2 = AbstractModeladaptor(model=DumpModel('DumbLabel'), translation_dictionary={'DumbLabel': 'L1'})
+    myAdaptor3 = AbstractModeladaptor(model=DumpModel('DumbLabel'), translation_dictionary={'DumbLabel': 'L2'})
 
-    @ex.automain
-    def run(datapoints, annotation, myAdaptor1, myAdaptor2, myAdaptor3):
-        testPipeline = Pipeline(datapoints, annotation, [('Dumb adaptor1', myAdaptor1),
-                                                         ('Dumb adaptor2', myAdaptor2),
-                                                         ('Dumb adaptor3', myAdaptor3)
-                                                         ])
-        testPipeline.fit(0.75)
-        print('Certain------------')
-        print(testPipeline.certain_data_set())
-        print('Uncertain----------')
-        print(testPipeline.uncertain_data_set())
-        print('Full---------------')
-        print(testPipeline.full_data_set())
-        return
+    testPipeline = Pipeline(datapoints, annotation, [('Dumb adaptor1', myAdaptor1),
+                                                     ('Dumb adaptor2', myAdaptor2),
+                                                     ('Dumb adaptor3', myAdaptor3)
+                                                     ])
+    testPipeline.fit(0.75)
+    print('Certain------------')
+    print(testPipeline.certain_data_set())
+    print('Uncertain----------')
+    print(testPipeline.uncertain_data_set())
+    print('Full---------------')
+    print(testPipeline.full_data_set())
 
     print('-----------Comple Sklearn MLP-----------')
     from sklearn import datasets, neural_network, metrics

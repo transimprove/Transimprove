@@ -1,11 +1,19 @@
 name: ip5
 channels:
   - defaults
+  - districtdatalabs
 dependencies:
   - python=3.6
   - matplotlib
   - jupyter
   - numpy
   - pandas
+  - scikit-learn
+  - yellowbrick
+  - pip:
+      - sacred
+      - pymongo
+      - python-dotenv
+
 prefix: /usr/local/miniconda3/envs/ip5
 

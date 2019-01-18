@@ -2,9 +2,6 @@ import os
 from shutil import rmtree
 
 import numpy as np
-# from dotenv import load_dotenv
-# from sacred import Experiment
-# from sacred.observers import MongoObserver
 
 from Experiments.helper.DeepDIVAModelAdapter import DeepDIVAModelAdapter
 from Experiments.helper.plots import plot_score_comparisons
@@ -17,15 +14,7 @@ import config
 from Transimprove.Pipeline import Pipeline
 
 
-#
-# ex = Experiment('DeepDIVAExperiment')
-# load_dotenv()
-# mongodb_port = os.getenv("MONGO_DB_PORT")
-# uri = "mongodb://sample:password@localhost:" + str(mongodb_port) + "/db?authSource=admin"
-# ex.observers.append(MongoObserver.create(url=uri, db_name='db'))
-
-
-class DeepDivaMnistExperiment():
+class DeepDivaMnistExperiment(object):
     """
 
     """
@@ -49,16 +38,7 @@ class DeepDivaMnistExperiment():
         self.dir_existing_model = os.path.join(self.this_resource.get_experiment_directory(), "existing_model")
         self.dir_ground_truth_model = os.path.join(self.this_resource.get_experiment_directory(), "ground_truth_model")
 
-    # @ex.config
-    # def config(self):
-    #     annotations_per_label = 4
-    #     dataset_part_for_exising_model = 0.5
-    #
-    # @ex.main
     def main(self):
-
-        # run in /deepdiva/helper/data before using
-        # python get_a_dataset.py --dataset mnist --output-folder /dd_resources/data/
         annotations_per_label = 15
         dataset_part_for_exising_model = 0.7
 
@@ -93,17 +73,17 @@ class DeepDivaMnistExperiment():
         # Adding the ID to columns
         datapoints_for_pipeline = np.vstack((np.arange(0, len(X_datapoints)), X_datapoints)).T
 
-        transimporve_pipeline = Pipeline(datapoints_for_pipeline, annotations,
+        transimprove_pipeline = Pipeline(datapoints_for_pipeline, annotations,
                                          models=[('DeepDivaMNIST', existing_model)])
         consistencies = np.arange(0.50, 0.98, 0.01)
         scores = []
-        for consitency in consistencies:
-            transimporve_pipeline.fit(consitency)
-            score_certain, _ = self.train_MNIST_DeepDIVA_Model(transimporve_pipeline.certain_data_set(), os.path.join(
-                self.this_resource.get_experiment_directory(), str(consitency), 'certain_ds'))
-            score_full, _ = self.train_MNIST_DeepDIVA_Model(transimporve_pipeline.full_data_set(),
+        for consistency in consistencies:
+            transimprove_pipeline.fit(consistency)
+            score_certain, _ = self.train_MNIST_DeepDIVA_Model(transimprove_pipeline.certain_data_set(), os.path.join(
+                self.this_resource.get_experiment_directory(), str(consistency), 'certain_ds'))
+            score_full, _ = self.train_MNIST_DeepDIVA_Model(transimprove_pipeline.full_data_set(),
                                                             os.path.join(self.this_resource.get_experiment_directory(),
-                                                                         str(consitency), 'full_ds'))
+                                                                         str(consistency), 'full_ds'))
             scores.append(score_certain)
             scores.append(score_full)
 
