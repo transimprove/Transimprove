@@ -223,3 +223,6 @@ bash.exe.stackdump
 
 # Removes envrc for direnv
 .envrc
+
+# Ignore plots
+*.png
