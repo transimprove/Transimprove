@@ -12,11 +12,9 @@ from sklearn import svm, neural_network
 from matplotlib import pyplot as plt
 
 from Transimprove.Pipeline import Pipeline
-from experiments.helper.create_distributed_labels import generate_new_annotations_confusionmatrix
+from Experiments.helper.create_distributed_labels import generate_new_annotations_confusionmatrix
 from yellowbrick.classifier import ClassificationReport
 from yellowbrick.classifier import ConfusionMatrix
-
-# from Experiments.helper.pretty_print_confusion_matrix import plot_confusion_matrix_from_data
 
 ex = Experiment('SklearnProofOfConcept')
 load_dotenv()
@@ -51,16 +49,13 @@ def cfg():
 
 
 def classifier_report(classifier, X_test, y_test):
-    y_predicted = classifier.predict(X_test)
     classes = np.unique(y_test)
-    # fig = plot_confusion_matrix_from_data(y, y_predicted, classes)
     cm = ConfusionMatrix(classifier, classes=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
     cm.fit(X_test, y_test)
     cm.score(X_test, y_test)
     filename = classifier.__class__.__name__ + '_confusion_matrix.png'
     cm.poof(outpath=filename, clear_figure=True,
             kwargs=dict(transparent=False, dpi=80, inches='tight'))
-    # fig.savefig(filename, transparent=False, dpi=80, inches='tight')
     ex.add_artifact(filename)
     visualizer = ClassificationReport(classifier, classes=classes, support=True)
     visualizer.fit(X_test, y_test)

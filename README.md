@@ -45,5 +45,5 @@ To start this experiment in detached mode you can use:
 ```bash
 cd [projectDirectory]
 source activate deepdiva
-nohup python experiments/DeepDivaMnistExperiment.py &
+nohup python Experiments/DeepDivaMnistExperiment.py &
 ```
