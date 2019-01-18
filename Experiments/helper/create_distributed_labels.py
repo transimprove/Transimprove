@@ -24,6 +24,7 @@ def generate_new_labels(challenge_ids, labels, p, count):
     new_labels = np.random.choice(labels, count, True, p)
     return np.array([upsampled, new_labels]).transpose()
 
+
 def generate_new_annotations_confusionmatrix(cm, classes, datapoints, count=1000, normalize=False):
     """
     Generates annotations for each class given by the confusion matrix cm using generate new labels.

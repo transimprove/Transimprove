@@ -8,6 +8,15 @@ from config import EXPERIMENTS_PATH
 
 
 class Resource(object):
+    """
+    Represents our object to save experiments. Creates a folder in the root_dir directory using the following pattern:
+    timestamp1_uuid1: e.g. 2018-12-04_15:36_010f3092-f7d2-11e8-b0aa-6045cb6e240f.
+
+    Creates the following folder structure:
+    root_dir
+        - timestamp1_uuid1
+        - timestamp2_uuid2
+    """
 
     def __init__(self):
         self.identifier = uuid.uuid1()
@@ -20,13 +29,17 @@ class Resource(object):
         return os.path.join(self.root_dir, time_str + '_' + str(self.identifier))
 
     def add(self, object_to_add, *argv):
+        """
+        Adds any python object to the experiment.
+        """
         self.objects.append(object_to_add)
-        for object in argv:
-            self.objects.append(object)
+        for obj in argv:
+            self.objects.append(obj)
 
     def save(self):
-        filepath = os.path.join(self.get_experiment_directory(),'ObjectsSave.npz')
+        """
+        Saves the experiment with all added objects in the compressed npz format using np.savez.
+        """
+        filepath = os.path.join(self.get_experiment_directory(), 'ObjectsSave.npz')
         np.savez(filepath, *self.objects)
         return filepath
-
-        # creates new folder saves it under 2018-11-23 start_time uuid

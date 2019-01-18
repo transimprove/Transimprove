@@ -7,6 +7,7 @@ class DeepDIVADatasetAdapter(object):
     Creates a directory & file based training environment that natively works with DeepDIVA CNN implementation.
     Symlinks are used to reference files in self.root directory.
     """
+
     def __init__(self, input_dir):
         self.root = input_dir
 

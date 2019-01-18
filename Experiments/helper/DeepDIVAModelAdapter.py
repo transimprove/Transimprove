@@ -9,11 +9,11 @@ import uuid
 
 from Experiments.helper.DeepDIVADatasetAdapter import DeepDIVADatasetAdapter
 
-
-
 import sys
+
 sys.path.append("/deepdiva/")
 from template.RunMe import RunMe
+
 
 class DeepDIVAModelAdapter(object):
     """
@@ -52,7 +52,7 @@ class DeepDIVAModelAdapter(object):
                 "--dataset-folder", self.dir,
                 "--lr", "0.1",
                 "--epochs", str(self.EPOCHS),
-                "--ignoregit"]# ,"--no-cuda"]
+                "--ignoregit"]  # ,"--no-cuda"]
         return RunMe().main(args=args)
 
     # X is a list of paths of images
@@ -62,7 +62,7 @@ class DeepDIVAModelAdapter(object):
         :param X: 2D ndarray, Filenames
         :return: 2D ndarray, predicted classes
         """
-        data_root_dir = os.path.join('/tmp/DeepDIVAModelAdapter',str(uuid.uuid1()))
+        data_root_dir = os.path.join('/tmp/DeepDIVAModelAdapter', str(uuid.uuid1()))
         self.classes = sorted(os.listdir(os.path.join(self.dir, self.TRAIN_SUBFOLDER)))
         files_list = X[:, 0]
         self.copy_to_evaluate(files_list, data_root_dir)
@@ -81,8 +81,8 @@ class DeepDIVAModelAdapter(object):
         self.data_adapter.create_symlink_dataset(dataset, data_root_dir, subfolder=self.EVALUATE_SUBFOLDER)
 
     def apply_model(self, data_root_dir):
-        analytics_csv = glob(os.path.join(self.dir,self.ANALYTICS_FILE))[0]
-        os.symlink(analytics_csv, os.path.join(data_root_dir,self.EVALUATE_SUBFOLDER, self.ANALYTICS_FILE))
+        analytics_csv = glob(os.path.join(self.dir, self.ANALYTICS_FILE))[0]
+        os.symlink(analytics_csv, os.path.join(data_root_dir, self.EVALUATE_SUBFOLDER, self.ANALYTICS_FILE))
         best_model = glob(os.path.join(self.dir, '**', self.MODEL_NAME), recursive=True)
         args = ["--experiment-name", "DeepDivaModelAdapter_apply_model",
                 "--runner-class", "apply_model",
@@ -91,7 +91,7 @@ class DeepDIVAModelAdapter(object):
                 "--load-model", best_model[0],
                 "--ignoregit",
                 "--epochs", str(self.EPOCHS),
-                #"--no-cuda",
+                # "--no-cuda",
                 "--output-channels", len(self.classes).__str__()]
         RunMe().main(args=args)
 
@@ -101,19 +101,19 @@ class DeepDIVAModelAdapter(object):
         :param data_root_dir:
         :return:
         """
-        output = glob(os.path.join(data_root_dir,self.EVALUATION_LOG, '**', self.EVALUATION_OUTPUT_FILE), recursive=True)[0]
+        output = \
+        glob(os.path.join(data_root_dir, self.EVALUATION_LOG, '**', self.EVALUATION_OUTPUT_FILE), recursive=True)[0]
         with open(output, 'rb') as file:
             data = pickle.load(file)
 
         X = data[3]
         y = np.argmax(data[0], axis=1)
-        return np.vstack((X,y)).T
-
+        return np.vstack((X, y)).T
 
     def map_dataset(self, X, classification_results):
-        #X = [['/.../label/picture.png'],
+        # X = [['/.../label/picture.png'],
         #     ['/.../label/picture2.png']]
-        #results_dataset = [['/.../dummy/picture.png','label'],
+        # results_dataset = [['/.../dummy/picture.png','label'],
         #                   ['/.../dummy/picture2.png','label']]
         X = pd.DataFrame(np.atleast_2d(X).T, columns=['Original_files'])
         X['Original_files'] = X['Original_files'].apply(lambda path: os.path.basename(path))
@@ -123,7 +123,7 @@ class DeepDIVAModelAdapter(object):
         y['Label_index'] = y.Label_index.astype(int)
         y['Label'] = y['Label_index'].apply(lambda index: self.classes[index])
 
-        merged = pd.merge(X,y,how='left',left_on=['Original_files'], right_on=['Copied_files'])
+        merged = pd.merge(X, y, how='left', left_on=['Original_files'], right_on=['Copied_files'])
         return merged['Label'].values
 
 
@@ -144,9 +144,9 @@ if __name__ == '__main__':
 
         # Run fit
         ddma.train()
-    if os.path.exists(os.path.join(playground_dir,ddma.MODEL_LOG)) and remove_someother:
-        if os.path.exists(os.path.join(playground_dir,'someOtherModelDir')):
-            shutil.rmtree(os.path.join(playground_dir,'someOtherModelDir'))
+    if os.path.exists(os.path.join(playground_dir, ddma.MODEL_LOG)) and remove_someother:
+        if os.path.exists(os.path.join(playground_dir, 'someOtherModelDir')):
+            shutil.rmtree(os.path.join(playground_dir, 'someOtherModelDir'))
         # testwise use val as unknown dataset split
         eval_dataset = data_adapter.read_folder_dataset(subfolder='val')
         ddma.predict(eval_dataset, os.path.join(playground_dir, 'someOtherModelDir'))

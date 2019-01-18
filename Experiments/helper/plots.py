@@ -4,50 +4,34 @@ import numpy as np
 from matplotlib import pyplot as plt
 import pandas as pd
 
-def plot_score_comparisons(experiment_path,consistencies, scores, columns, max_possible_score, existing_score, crop_y=False):
+
+def plot_score_comparisons(experiment_path, consistencies, scores, columns, max_possible_score, existing_score,
+                           crop_y=False):
     """
-    :param experiment_path:
-    :param consistencies:
-    :param scores:
-    :param columns:
-    :param max_possible_score:
-    :param existing_score:
-    :param crop_y:
-    :return:
+    Creates the comparison plot that is used in the paper and saves it in the experiment folder. 
+    Plots the different accuracy scores on the y-axis and the consistencies on the x-axis.
+    :param experiment_path: str
+    :param consistencies: []
+    :param scores: 2d []
+    :param columns: [str]
+    :param max_possible_score: int
+    :param existing_score: int
+    :param crop_y: bool: if true, the cropped version which gives more detail is plotted
     """
     scores = np.array(scores).reshape(len(consistencies), len(columns))
-    data = pd.DataFrame(data=scores, index=consistencies*100, columns=columns)
-    max_possible_scores = np.repeat(max_possible_score,len(consistencies))
-    existing_scores = np.repeat(existing_score,len(consistencies))
+    data = pd.DataFrame(data=scores, index=consistencies * 100, columns=columns)
+    max_possible_scores = np.repeat(max_possible_score, len(consistencies))
+    existing_scores = np.repeat(existing_score, len(consistencies))
     data['Ground truth-model'] = max_possible_scores
     data['Plug-in-model'] = existing_scores
     fig, ax = plt.subplots()
     title = "Accuracy comparison"
-    if  crop_y:
-        ax.set_ylim((min(data[columns[1]])-1, max(data[columns[1]])+0.5))
+    if crop_y:
+        ax.set_ylim((min(data[columns[1]]) - 1, max(data[columns[1]]) + 0.5))
         title = title + " cropped"
     data.plot(ax=ax)
     ax.set(xlabel='Consistency (%)', ylabel='Accuracy (%)')
     ax.set_title(title, fontsize=14, fontweight='bold')
+    # uncomment to show the plot instead of saving it
     # plt.show()
-    fig.savefig(os.path.join(experiment_path,title+".png"), transparent=False, dpi=200, inches='tight', format='png')
-
-
-
-
-if __name__ == '__main__':
-    scores = np.array([[98.17, 98.56]
-                 , [97.73, 98.35]
-                 , [98.18, 97.76]
-                 , [98.06, 97.78]
-                 , [98.05, 97.74]
-                 , [97.61, 98.06]
-                 , [97.26, 97.57]
-                 , [97.97, 97.64]
-                 , [97.52, 97.9]
-                 , [95.21, 97.78]
-                 , [95.45, 97.49]
-                 , [89.78, 97.47]
-                 , [73.79, 97.43]])
-    plot_score_comparisons(np.arange(0.60, 0.90, 0.025), scores, ['Certain split', 'Full split'], 98, 99)
-    plot_score_comparisons(np.arange(0.60, 0.90, 0.025), scores, ['Certain split', 'Full split'], 98, 99, True)
+    fig.savefig(os.path.join(experiment_path, title + ".png"), transparent=False, dpi=200, inches='tight', format='png')
