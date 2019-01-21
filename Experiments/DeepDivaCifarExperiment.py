@@ -77,16 +77,16 @@ class DeepDivaCifarExperiment(object):
         datapoints_for_pipeline = np.vstack((np.arange(0, len(X_datapoints)), X_datapoints)).T
 
         transimprove_pipeline = Pipeline(datapoints_for_pipeline, annotations,
-                                         models=[('DeepDivaMNIST', existing_model)])
+                                         models=[('DeepDivaCIFAR', existing_model)])
         consistencies = np.arange(0.50, 0.98, 0.01)
 
         # runs multiple experiments for each consistency threshold in the defined range above
         scores = []
         for consistency in consistencies:
             transimprove_pipeline.fit(consistency)
-            score_certain, _ = self.train_MNIST_DeepDIVA_Model(transimprove_pipeline.certain_data_set(), os.path.join(
+            score_certain, _ = self.train_CIFAR_DeepDIVA_Model(transimprove_pipeline.certain_data_set(), os.path.join(
                 self.this_resource.get_experiment_directory(), str(consistency), 'certain_ds'))
-            score_full, _ = self.train_MNIST_DeepDIVA_Model(transimprove_pipeline.full_data_set(),
+            score_full, _ = self.train_CIFAR_DeepDIVA_Model(transimprove_pipeline.full_data_set(),
                                                             os.path.join(self.this_resource.get_experiment_directory(),
                                                                          str(consistency), 'full_ds'))
             scores.append(score_certain)
