@@ -62,13 +62,13 @@ class DeepDivaCifarExperiment(object):
             print(label, " count: ", np.sum(annotations[:, 1] == label))
 
         print("\n\n\n\n\n==============Train existing model====================")
-        existing_score, existing_model = self.train_MNIST_DeepDIVA_Model(X_y_existing_model, self.dir_existing_model)
+        existing_score, existing_model = self.train_CIFAR_DeepDIVA_Model(X_y_existing_model, self.dir_existing_model)
         print("Score of existing model: ", existing_score)
         y = existing_model.predict(np.atleast_2d(X_y_existing_model[:, 0]).T)
         print(y)
 
         print("\n\n\n\n\n==============Train truth model====================")
-        possible_score, _ = self.train_MNIST_DeepDIVA_Model(X_y_remaining, self.dir_ground_truth_model)
+        possible_score, _ = self.train_CIFAR_DeepDIVA_Model(X_y_remaining, self.dir_ground_truth_model)
         print("Score of truth model: ", possible_score)
 
         print("\n\n\n\n\n==============Pipeline Implementation====================")
