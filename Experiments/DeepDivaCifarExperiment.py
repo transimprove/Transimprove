@@ -54,7 +54,7 @@ class DeepDivaCifarExperiment(object):
         self.dir_ground_truth_model = os.path.join(self.this_resource.get_experiment_directory(), "ground_truth_model")
 
     def main(self):
-        annotations_per_label = 15
+        annotations_per_label = 500
         dataset_part_for_exising_model = 0.1
 
         X_y = self.adaptor.read_folder_dataset(subfolder='original_train')
