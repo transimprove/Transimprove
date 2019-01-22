@@ -55,7 +55,7 @@ class DeepDivaCifarExperiment(object):
 
     def main(self):
         annotations_per_label = 15
-        dataset_part_for_exising_model = 0.3
+        dataset_part_for_exising_model = 0.1
 
         X_y = self.adaptor.read_folder_dataset(subfolder='original_train')
         X_y_test = self.adaptor.read_folder_dataset(subfolder='test')
