@@ -90,7 +90,8 @@ class DeepDivaCifarExperiment(object):
 
         transimprove_pipeline = Pipeline(datapoints_for_pipeline, annotations,
                                          models=[('DeepDivaCIFAR', existing_model)])
-        consistencies = np.arange(0.50, 0.98, 0.01)
+        #run one experiment every 5%
+        consistencies = np.arange(0.50, 0.98, 0.05)
 
         # runs multiple experiments for each consistency threshold in the defined range above
         scores = []
