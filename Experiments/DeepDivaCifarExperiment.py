@@ -39,22 +39,22 @@ class DeepDivaCifarExperiment(object):
         self.cm = np.array([
             # [0,  1,   2,   3,   4    5    6    7    8    9] given Laben/ true label
             [1, 0, 0, 0, 0, 0, 0, 0, 0, 0],  # 0
-            [0, 0.7, 0, 0, 0, 0, 0, 0, 0, 0.3],  # 1
+            [0, 0.8, 0, 0, 0, 0, 0, 0, 0, 0.2],  # 1
             [0, 0, 1, 0, 0, 0, 0, 0, 0, 0],  # 2
             [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],  # 3
-            [0, 0, 0, 0, 0.6, 0, 0, 0.4, 0, 0],  # 4
+            [0, 0, 0, 0, 0.8, 0, 0, 0.2, 0, 0],  # 4
             [0, 0, 0, 0, 0, 1, 0, 0, 0, 0],  # 5
             [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],  # 6
-            [0, 0, 0, 0, 0.4, 0, 0, 0.6, 0, 0],  # 7
+            [0, 0, 0, 0, 0.2, 0, 0, 0.8, 0, 0],  # 7
             [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],  # 8
-            [0, 0.3, 0, 0, 0, 0, 0, 0, 0, 0.7]  # 9
+            [0, 0.2, 0, 0, 0, 0, 0, 0, 0, 0.8]  # 9
         ])
         self.adaptor = DeepDIVADatasetAdapter(config.CIFAR_PATH_ORIGINAL)
         self.dir_existing_model = os.path.join(self.this_resource.get_experiment_directory(), "existing_model")
         self.dir_ground_truth_model = os.path.join(self.this_resource.get_experiment_directory(), "ground_truth_model")
 
     def main(self):
-        annotations_per_label = 500
+        annotations_per_label = 50
         dataset_part_for_exising_model = 0.1
 
         X_y = self.adaptor.read_folder_dataset(subfolder='original_train')
