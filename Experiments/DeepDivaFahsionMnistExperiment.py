@@ -91,31 +91,33 @@ class DeepDivaFashionMnistExperiment(object):
         consistencies = np.arange(0.50, 0.98, 0.03)
 
         # runs multiple experiments for each consistency threshold in the defined range above
-        scores = []
+        scores_certain = []
+        scores_full = []
+        std_certain = []
+        std_full = []
         for consistency in consistencies:
             transimprove_pipeline.fit(consistency)
-            certain_scores = []
-            full_scores = []
+            tmp_certain_scores = []
+            tmp_full_scores = []
             for iteration in range(1, 10):
                 score_certain, _ = self.train_FMNIST_DeepDIVA_Model(transimprove_pipeline.certain_data_set(), os.path.join(
                 self.this_resource.get_experiment_directory(), str(consistency), 'certain_ds'))
                 score_full, _ = self.train_FMNIST_DeepDIVA_Model(transimprove_pipeline.full_data_set(),
                                                             os.path.join(self.this_resource.get_experiment_directory(),
                                                                          str(consistency), 'full_ds'))
-                certain_scores.append(score_certain)
-                full_scores.append(score_full)
-            scores.append(np.average(certain_scores))
-            scores.append(np.average(full_scores))
+                tmp_certain_scores.append(score_certain)
+                tmp_full_scores.append(score_full)
+            scores_certain.append(np.average(tmp_certain_scores))
+            std_certain.append(np.std(tmp_certain_scores))
+            scores_full.append(np.average(tmp_full_scores))
+            std_full.append(np.std(tmp_full_scores))
 
         scores = np.array(scores).reshape(len(consistencies), 2)
         print(scores)
         self.this_resource.add(scores)
         self.this_resource.save()
-        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores,
-                               ['Certain dataset-model', 'Full dataset-model'], possible_score, existing_score)
-        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores,
-                               ['Certain dataset-model', 'Full dataset-model'], possible_score, existing_score,
-                               crop_y=True)
+        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores_certain, scores_full, std_certain, std_full,
+                               possible_score, existing_score)
 
     def train_FMNIST_DeepDIVA_Model(self, X_y_data, directory):
         deep_diva_fmnist_model = DeepDIVAModelAdapter(directory, self.adaptor)

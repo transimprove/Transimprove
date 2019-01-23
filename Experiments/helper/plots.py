@@ -5,31 +5,32 @@ from matplotlib import pyplot as plt
 import pandas as pd
 
 
-def plot_score_comparisons(experiment_path, consistencies, scores, columns, max_possible_score, existing_score,
+def plot_score_comparisons(experiment_path, consistencies, scores_certain, scores_full, std_certain, std_full, max_possible_score, existing_score,
                            crop_y=False):
     """
     Creates the comparison plot that is used in the paper and saves it in the experiment folder. 
     Plots the different accuracy scores on the y-axis and the consistencies on the x-axis.
     :param experiment_path: str
     :param consistencies: []
-    :param scores: 2d []
-    :param columns: [str]
+    :param scores_certain: []
+    :param scores_full: []
+    :param std_certain: []
+    :param std_full: []
     :param max_possible_score: int
     :param existing_score: int
     :param crop_y: bool: if true, the cropped version which gives more detail is plotted
     """
-    scores = np.array(scores).reshape(len(consistencies), len(columns))
-    data = pd.DataFrame(data=scores, index=consistencies * 100, columns=columns)
     max_possible_scores = np.repeat(max_possible_score, len(consistencies))
     existing_scores = np.repeat(existing_score, len(consistencies))
-    data['Ground truth-model'] = max_possible_scores
-    data['Plug-in-model'] = existing_scores
     fig, ax = plt.subplots()
     title = "accuracy"
-    if crop_y:
-        ax.set_ylim((min(data[columns[1]]) - 1, max(data[columns[1]]) + 0.5))
-        title = title + "_cropped"
-    data.plot(ax=ax)
+    l1 = ax.plot(consistencies, max_possible_scores, color='red', label='Ground truth-model')
+    l2 = ax.plot(consistencies, existing_scores, color='green', label='Plug-in-model')
+    l3 = ax.plot(consistencies, scores_certain, color='blue', label='Certain dataset-model')
+    ax.fill_between(consistencies, scores_certain-std_certain,scores_certain+std_certain, alpha=0.2, facecolor='royalblue' )
+    l4 = ax.plot(consistencies, scores_full, color='orange', label='Full dataset-model')
+    ax.fill_between(consistencies, scores_full-std_full,scores_full+std_full, alpha=0.2, facecolor='peachpuff')
+    ax.legend(loc='lower left')
     ax.set(xlabel='Consistency (%)', ylabel='Accuracy (%)')
     ax.set_title(title, fontsize=14, fontweight='bold')
     # uncomment to show the plot instead of saving it
