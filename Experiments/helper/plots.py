@@ -25,10 +25,10 @@ def plot_score_comparisons(experiment_path, consistencies, scores, columns, max_
     data['Ground truth-model'] = max_possible_scores
     data['Plug-in-model'] = existing_scores
     fig, ax = plt.subplots()
-    title = "Accuracy comparison"
+    title = "accuracy"
     if crop_y:
         ax.set_ylim((min(data[columns[1]]) - 1, max(data[columns[1]]) + 0.5))
-        title = title + " cropped"
+        title = title + "_cropped"
     data.plot(ax=ax)
     ax.set(xlabel='Consistency (%)', ylabel='Accuracy (%)')
     ax.set_title(title, fontsize=14, fontweight='bold')
