@@ -52,7 +52,7 @@ class DeepDivaFashionMnistExperiment(object):
 
     def main(self):
         annotations_per_label = 50
-        dataset_part_for_exising_model = 0.7
+        dataset_part_for_exising_model = 0.1
 
         X_y = self.adaptor.read_folder_dataset(subfolder='original_train')
         X_y_test = self.adaptor.read_folder_dataset(subfolder='test')
@@ -94,13 +94,18 @@ class DeepDivaFashionMnistExperiment(object):
         scores = []
         for consistency in consistencies:
             transimprove_pipeline.fit(consistency)
-            score_certain, _ = self.train_FMNIST_DeepDIVA_Model(transimprove_pipeline.certain_data_set(), os.path.join(
+            certain_scores = []
+            full_scores = []
+            for iteration in range(1, 10):
+                score_certain, _ = self.train_FMNIST_DeepDIVA_Model(transimprove_pipeline.certain_data_set(), os.path.join(
                 self.this_resource.get_experiment_directory(), str(consistency), 'certain_ds'))
-            score_full, _ = self.train_FMNIST_DeepDIVA_Model(transimprove_pipeline.full_data_set(),
+                score_full, _ = self.train_FMNIST_DeepDIVA_Model(transimprove_pipeline.full_data_set(),
                                                             os.path.join(self.this_resource.get_experiment_directory(),
                                                                          str(consistency), 'full_ds'))
-            scores.append(score_certain)
-            scores.append(score_full)
+                certain_scores.append(score_certain)
+                full_scores.append(score_full)
+            scores.append(np.average(certain_scores))
+            scores.append(np.average(full_scores))
 
         scores = np.array(scores).reshape(len(consistencies), 2)
         print(scores)
