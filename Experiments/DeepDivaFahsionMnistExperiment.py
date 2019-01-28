@@ -91,7 +91,6 @@ class DeepDivaFashionMnistExperiment(object):
         consistencies = np.arange(0.50, 0.98, 0.03)
 
         # runs multiple experiments for each consistency threshold in the defined range above
-        scores = []
         scores_certain = []
         scores_full = []
         std_certain = []
@@ -113,9 +112,10 @@ class DeepDivaFashionMnistExperiment(object):
             scores_full.append(np.average(tmp_full_scores))
             std_full.append(np.std(tmp_full_scores))
 
-        scores = np.array(scores).reshape(len(consistencies), 2)
-        print(scores)
-        self.this_resource.add(scores)
+        self.this_resource.add(scores_certain)
+        self.this_resource.add(std_certain)
+        self.this_resource.add(scores_full)
+        self.this_resource.add(std_full)
         self.this_resource.save()
         plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores_certain, scores_full, std_certain, std_full,
                                possible_score, existing_score)
