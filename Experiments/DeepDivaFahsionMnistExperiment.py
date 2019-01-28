@@ -91,6 +91,7 @@ class DeepDivaFashionMnistExperiment(object):
         consistencies = np.arange(0.50, 0.98, 0.03)
 
         # runs multiple experiments for each consistency threshold in the defined range above
+        scores = []
         scores_certain = []
         scores_full = []
         std_certain = []
