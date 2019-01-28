@@ -42,7 +42,7 @@ class DeepDivaMnistExperiment(object):
         self.dir_ground_truth_model = os.path.join(self.this_resource.get_experiment_directory(), "ground_truth_model")
 
     def main(self):
-        annotations_per_label = 15
+        annotations_per_label = 50
         dataset_part_for_exising_model = 0.7
 
         X_y = self.adaptor.read_folder_dataset(subfolder='original_train')
@@ -78,29 +78,38 @@ class DeepDivaMnistExperiment(object):
 
         transimprove_pipeline = Pipeline(datapoints_for_pipeline, annotations,
                                          models=[('DeepDivaMNIST', existing_model)])
-        consistencies = np.arange(0.50, 0.98, 0.01)
+        #run one experiment every 5%
+        consistencies = np.arange(0.50, 0.98, 0.03)
 
         # runs multiple experiments for each consistency threshold in the defined range above
-        scores = []
+        scores_certain = []
+        scores_full = []
+        std_certain = []
+        std_full = []
         for consistency in consistencies:
             transimprove_pipeline.fit(consistency)
-            score_certain, _ = self.train_MNIST_DeepDIVA_Model(transimprove_pipeline.certain_data_set(), os.path.join(
+            tmp_certain_scores = []
+            tmp_full_scores = []
+            for iteration in range(1, 3):
+                score_certain, _ = self.train_MNIST_DeepDIVA_Model(transimprove_pipeline.certain_data_set(), os.path.join(
                 self.this_resource.get_experiment_directory(), str(consistency), 'certain_ds'))
-            score_full, _ = self.train_MNIST_DeepDIVA_Model(transimprove_pipeline.full_data_set(),
+                score_full, _ = self.train_MNIST_DeepDIVA_Model(transimprove_pipeline.full_data_set(),
                                                             os.path.join(self.this_resource.get_experiment_directory(),
                                                                          str(consistency), 'full_ds'))
-            scores.append(score_certain)
-            scores.append(score_full)
+                tmp_certain_scores.append(score_certain)
+                tmp_full_scores.append(score_full)
+            scores_certain.append(np.average(tmp_certain_scores))
+            std_certain.append(np.std(tmp_certain_scores))
+            scores_full.append(np.average(tmp_full_scores))
+            std_full.append(np.std(tmp_full_scores))
 
-        scores = np.array(scores).reshape(len(consistencies), 2)
-        print(scores)
-        self.this_resource.add(scores)
+        self.this_resource.add(scores_certain)
+        self.this_resource.add(std_certain)
+        self.this_resource.add(scores_full)
+        self.this_resource.add(std_full)
         self.this_resource.save()
-        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores,
-                               ['Certain dataset-model', 'Full dataset-model'], possible_score, existing_score)
-        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores,
-                               ['Certain dataset-model', 'Full dataset-model'], possible_score, existing_score,
-                               crop_y=True)
+        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores_certain, scores_full, std_certain, std_full,
+                               possible_score, existing_score)
 
     def train_MNIST_DeepDIVA_Model(self, X_y_data, directory):
         deep_diva_mnist_model = DeepDIVAModelAdapter(directory, self.adaptor)
