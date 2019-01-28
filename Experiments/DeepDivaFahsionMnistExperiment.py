@@ -52,7 +52,7 @@ class DeepDivaFashionMnistExperiment(object):
 
     def main(self):
         annotations_per_label = 50
-        dataset_part_for_exising_model = 0.1
+        dataset_part_for_exising_model = 0.3
 
         X_y = self.adaptor.read_folder_dataset(subfolder='original_train')
         X_y_test = self.adaptor.read_folder_dataset(subfolder='test')
@@ -100,7 +100,7 @@ class DeepDivaFashionMnistExperiment(object):
             transimprove_pipeline.fit(consistency)
             tmp_certain_scores = []
             tmp_full_scores = []
-            for iteration in range(1, 10):
+            for iteration in range(1, 3):
                 score_certain, _ = self.train_FMNIST_DeepDIVA_Model(transimprove_pipeline.certain_data_set(), os.path.join(
                 self.this_resource.get_experiment_directory(), str(consistency), 'certain_ds'))
                 score_full, _ = self.train_FMNIST_DeepDIVA_Model(transimprove_pipeline.full_data_set(),
