@@ -160,7 +160,7 @@ class DeepDivaCifarExperiment(object):
         else:
             return np.nan, None
 
-    def find(name, path):
+    def find(self, name, path):
         for root, dirs, files in os.walk(path):
             if name in files:
                 return os.path.join(root, name)
