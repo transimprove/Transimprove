@@ -128,7 +128,7 @@ class DeepDivaCifarExperiment(object):
             tmp_maj_scores = []
             tmp_plugin_scores = []
 
-            for iteration in range(1, 1):
+            for iteration in range(1, 2):
                 # TRAIN CONSISTENT MODEL
                 score_certain, _ = self.train_CIFAR_DeepDIVA_Model(transimprove_pipeline.certain_data_set(),
                                                                    os.path.join(
