@@ -1,4 +1,5 @@
 import os
+import sys
 from shutil import rmtree
 
 import numpy as np
@@ -24,7 +25,7 @@ class DeepDivaCifarExperiment(object):
 
     def __init__(self):
         self.this_resource = Resource()
-        
+
         # CIFAR Classes:
         # 0: airplane
         # 1: automobile
@@ -52,14 +53,15 @@ class DeepDivaCifarExperiment(object):
         self.adaptor = DeepDIVADatasetAdapter(config.CIFAR_PATH_ORIGINAL)
         self.dir_existing_model = os.path.join(self.this_resource.get_experiment_directory(), "existing_model")
         self.dir_ground_truth_model = os.path.join(self.this_resource.get_experiment_directory(), "ground_truth_model")
+        self.dir_maj_vote_model = os.path.join(self.this_resource.get_experiment_directory(), "majority_vote_model")
 
     def main(self):
         annotations_per_label = 50
-        dataset_part_for_exising_model = 0.1
+        dataset_part_for_existing_model = 0.3
 
         X_y = self.adaptor.read_folder_dataset(subfolder='original_train')
         X_y_test = self.adaptor.read_folder_dataset(subfolder='test')
-        X_y_existing_model, X_y_remaining = train_test_split(X_y, train_size=dataset_part_for_exising_model,
+        X_y_existing_model, X_y_remaining = train_test_split(X_y, train_size=dataset_part_for_existing_model,
                                                              random_state=42)
 
         X_datapoints = X_y_remaining[:, 0]
@@ -75,13 +77,11 @@ class DeepDivaCifarExperiment(object):
 
         print("\n\n\n\n\n==============Train existing model====================")
         existing_score, existing_model = self.train_CIFAR_DeepDIVA_Model(X_y_existing_model, self.dir_existing_model)
-        print("Score of existing model: ", existing_score)
         y = existing_model.predict(np.atleast_2d(X_y_existing_model[:, 0]).T)
         print(y)
 
         print("\n\n\n\n\n==============Train truth model====================")
         possible_score, _ = self.train_CIFAR_DeepDIVA_Model(X_y_remaining, self.dir_ground_truth_model)
-        print("Score of truth model: ", possible_score)
 
         print("\n\n\n\n\n==============Pipeline Implementation====================")
         print(X_datapoints.shape)
@@ -89,31 +89,56 @@ class DeepDivaCifarExperiment(object):
         datapoints_for_pipeline = np.vstack((np.arange(0, len(X_datapoints)), X_datapoints)).T
 
         transimprove_pipeline = Pipeline(datapoints_for_pipeline, annotations,
-                                         models=[('DeepDivaCIFAR', existing_model)])
-        #run one experiment every 5%
-        consistencies = np.arange(0.50, 0.98, 0.05)
+                                         models=[('DeepDivaCifar', existing_model)])
+
+        print("\n\n\n\n\n==============Train Majority voting Model====================")
+        maj_score, _ = self.train_CIFAR_DeepDIVA_Model(transimprove_pipeline.certain_data_set(threshold=0),
+                                                       self.dir_maj_vote_model)
+        maj_best_model = self.find('model_best.pth.tar', self.dir_maj_vote_model)
+        print("Best Model: ", maj_best_model)
+        print("Score of existing model: ", existing_score)
+        print("Score of truth model: ", possible_score)
+        print("Score of MajVot model: ", maj_score)
+
+        sys.exit()
+        # run one experiment every 5%
+        consistencies = np.arange(0.50, 0.98, 0.1)
 
         # runs multiple experiments for each consistency threshold in the defined range above
-        scores = []
+        scores_certain = []
+        scores_full = []
+        std_certain = []
+        std_full = []
         for consistency in consistencies:
             transimprove_pipeline.fit(consistency)
-            score_certain, _ = self.train_CIFAR_DeepDIVA_Model(transimprove_pipeline.certain_data_set(), os.path.join(
-                self.this_resource.get_experiment_directory(), str(consistency), 'certain_ds'))
-            score_full, _ = self.train_CIFAR_DeepDIVA_Model(transimprove_pipeline.full_data_set(),
-                                                            os.path.join(self.this_resource.get_experiment_directory(),
-                                                                         str(consistency), 'full_ds'))
-            scores.append(score_certain)
-            scores.append(score_full)
+            tmp_certain_scores = []
+            tmp_full_scores = []
+            for iteration in range(1, 1):
+                # TRAIN CONSISTENT MODEL
+                score_certain, _ = self.train_CIFAR_DeepDIVA_Model(transimprove_pipeline.certain_data_set(),
+                                                                   os.path.join(
+                                                                       self.this_resource.get_experiment_directory(),
+                                                                       str(consistency), 'certain_ds'))
+                # TRAIN RELABELED MODEL
+                score_full, _ = self.train_CIFAR_DeepDIVA_Model(transimprove_pipeline.full_data_set(),
+                                                                os.path.join(
+                                                                    self.this_resource.get_experiment_directory(),
+                                                                    str(consistency), 'full_ds'))
+                tmp_certain_scores.append(score_certain)
+                tmp_full_scores.append(score_full)
+            scores_certain.append(np.average(tmp_certain_scores))
+            std_certain.append(np.std(tmp_certain_scores))
+            scores_full.append(np.average(tmp_full_scores))
+            std_full.append(np.std(tmp_full_scores))
 
-        scores = np.array(scores).reshape(len(consistencies), 2)
-        print(scores)
-        self.this_resource.add(scores)
+        self.this_resource.add(scores_certain)
+        self.this_resource.add(std_certain)
+        self.this_resource.add(scores_full)
+        self.this_resource.add(std_full)
         self.this_resource.save()
-        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores,
-                               ['Certain dataset-model', 'Full dataset-model'], possible_score, existing_score)
-        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores,
-                               ['Certain dataset-model', 'Full dataset-model'], possible_score, existing_score,
-                               crop_y=True)
+        plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores_certain,
+                               scores_full, std_certain, std_full,
+                               possible_score, existing_score)
 
     def train_CIFAR_DeepDIVA_Model(self, X_y_data, directory):
         deep_diva_cifar_model = DeepDIVAModelAdapter(directory, self.adaptor)
@@ -134,6 +159,11 @@ class DeepDivaCifarExperiment(object):
             return test, deep_diva_cifar_model
         else:
             return np.nan, None
+
+    def find(name, path):
+        for root, dirs, files in os.walk(path):
+            if name in files:
+                return os.path.join(root, name)
 
 
 if __name__ == '__main__':

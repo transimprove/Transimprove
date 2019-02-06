@@ -50,7 +50,23 @@ class DeepDIVAModelAdapter(object):
         args = ["--experiment-name", "DeepDivaModelAdapter_train",
                 "--output-folder", os.path.join(self.dir, self.MODEL_LOG),
                 "--dataset-folder", self.dir,
-                "--lr", "0.1",
+                "--lr", "0.001",
+                "--epochs", str(self.EPOCHS),
+                "--ignoregit"]  # ,"--no-cuda"]
+        return RunMe().main(args=args)
+
+    def retrain(self, model):
+        """
+        Start retraining of working directory with DeepDIVA
+        :param model: path to the model to use for retraining
+        :return:
+        """
+        self.classes = sorted(os.listdir(os.path.join(self.dir, self.TRAIN_SUBFOLDER)))
+        args = ["--experiment-name", "DeepDivaModelAdapter_train",
+                "--output-folder", os.path.join(self.dir, self.MODEL_LOG),
+                "--dataset-folder", self.dir,
+                "--load-model", model,
+                "--lr", "0.001",
                 "--epochs", str(self.EPOCHS),
                 "--ignoregit"]  # ,"--no-cuda"]
         return RunMe().main(args=args)
@@ -102,7 +118,7 @@ class DeepDIVAModelAdapter(object):
         :return:
         """
         output = \
-        glob(os.path.join(data_root_dir, self.EVALUATION_LOG, '**', self.EVALUATION_OUTPUT_FILE), recursive=True)[0]
+            glob(os.path.join(data_root_dir, self.EVALUATION_LOG, '**', self.EVALUATION_OUTPUT_FILE), recursive=True)[0]
         with open(output, 'rb') as file:
             data = pickle.load(file)
 
