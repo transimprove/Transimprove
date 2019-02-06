@@ -177,7 +177,7 @@ class DeepDivaCifarExperiment(object):
         self.this_resource.save()
         plot_score_comparisons(self.this_resource.get_experiment_directory(), consistencies, scores_certain,
                                scores_full, std_certain, std_full, scores_retrain_maj, std_retrain_maj, scores_retrain_plugin, std_retrain_plugin,
-                               possible_score, existing_score)
+                               possible_score, existing_score, maj_score)
 
     def train_CIFAR_DeepDIVA_Model(self, X_y_data, directory, retrain=False, retrainModel=None):
         deep_diva_cifar_model = DeepDIVAModelAdapter(directory, self.adaptor)
