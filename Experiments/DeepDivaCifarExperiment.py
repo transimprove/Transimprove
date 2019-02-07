@@ -59,8 +59,8 @@ class DeepDivaCifarExperiment(object):
             self.this_resource.get_experiment_directory(), "majority_vote_model")
 
     def main(self):
-        annotations_per_label = 50
-        dataset_part_for_existing_model = 0.3
+        annotations_per_label = 5
+        dataset_part_for_existing_model = 0.05
 
         X_y = self.adaptor.read_folder_dataset(subfolder='original_train')
         X_y_test = self.adaptor.read_folder_dataset(subfolder='test')
